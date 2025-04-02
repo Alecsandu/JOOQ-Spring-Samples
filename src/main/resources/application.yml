@@ -3,6 +3,6 @@ spring:
     name: "Demo APP with jOOQ, so cool, and Docker, waw"
 
   datasource:
-    url: jdbc:postgresql://postgres:5432/jooq-demo
+    url: jdbc:postgresql://localhost:5432/jooq-demo
     username: root
     password: root

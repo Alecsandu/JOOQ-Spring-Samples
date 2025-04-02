@@ -1,9 +1,13 @@
 
-# Sample scripts for building docker images and running docker containers
+# Sample scripts for building docker image and creating docker container
+
+Build image
 
 ```shell
 docker build -t java-cool:v-noice .
 ```
+
+Create container
 
 ```shell
 docker run -it --rm --network demo_demo-net -p 8080:8080 java-cool:v-noice

@@ -25,7 +25,8 @@ public class DataApi {
     @GetMapping("/table")
     public String createTable() {
         dslContext.createTableIfNotExists("data")
-                .column(field("id", SQLDataType.UUID))
+                .column("id", SQLDataType.UUID)
+                .primaryKey("id")
                 .column(field("name", SQLDataType.VARCHAR(50)))
                 .execute();
 
@@ -34,8 +35,8 @@ public class DataApi {
 
     @GetMapping("/insert")
     public boolean addData() {
-        dslContext.insertInto(table("data"), field("name"))
-                .values("Mere" + UUID.randomUUID())
+        dslContext.insertInto(table("data"), field("id"), field("name"))
+                .values(UUID.randomUUID(), "Mere" + UUID.randomUUID())
                 .execute();
 
         return true;
@@ -43,7 +44,26 @@ public class DataApi {
 
     @GetMapping("/all")
     public List<String> getData() {
-        return dslContext.select(table("data"))
+        return dslContext.select(field("id"), field("name"))
+                .from(table("data"))
+                .stream()
+                .map(record -> record.get("id") + " " + record.get("name"))
+                .toList();
+    }
+
+    @GetMapping
+    public List<String> getDataAllOps() {
+        dslContext.createTableIfNotExists("data")
+                .column("id", SQLDataType.UUID)
+                .primaryKey("id")
+                .column(field("name", SQLDataType.VARCHAR(50)))
+                .execute();
+        dslContext.insertInto(table("data"), field("id"), field("name"))
+                .values(UUID.randomUUID(), "Mere" + UUID.randomUUID())
+                .execute();
+
+        return dslContext.select(field("id"), field("name"))
+                .from(table("data"))
                 .stream()
                 .map(record -> record.get("id") + " " + record.get("name"))
                 .toList();
