@@ -1,2 +1,4 @@
-CREATE DATABASE IF NOT EXISTS `jooq-demo`;
-USE `jooq-demo`;
+CREATE TABLE IF NOT EXISTS data (
+    id UUID PRIMARY KEY,
+    name VARCHAR(50)
+);
