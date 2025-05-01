@@ -4,5 +4,5 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/jooq-demo
-    username: root
+    username: postgres
     password: root

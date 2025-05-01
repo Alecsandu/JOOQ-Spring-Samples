@@ -4,14 +4,14 @@ services:
     image: postgres:17.4-alpine3.21
     container_name: postgres
     environment:
-      POSTGRES_USER: root
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: jooq-demo
     ports:
       - "5432:5432"
     volumes:
       - ./config/docker/postgresql/01_database_init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./data/postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - demo-net
 
@@ -20,9 +20,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/postgres_data
+  postgres_data: {}
+
