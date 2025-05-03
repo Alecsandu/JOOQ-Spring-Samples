@@ -24,9 +24,9 @@ podman image prune -f
 ### Create container
 
 ```shell
-docker run -it --rm --network demo_demo-net -p 8080:8080 java-jooq-spring:0.0.1
+docker run -it --rm --network jooq-spring-samples_demo-net -p 8080:8080 java-jooq-spring:0.0.1
 ```
 or with podman (network name can contain the root folder as a prefix)
 ```shell
-podman run -it --rm --network demo_demo-net -p 8080:8080 java-jooq-spring:0.0.1
+podman run -it --rm --network jooq-spring-samples_demo-net -p 8080:8080 java-jooq-spring:0.0.1
 ```
