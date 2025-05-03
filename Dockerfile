@@ -34,4 +34,4 @@ RUN apk add --no-cache shadow coreutils
 RUN groupadd -r app-group && useradd -r -g app-group app-user
 RUN chown -R app-user:app-group /opt/app
 USER app-user
-ENTRYPOINT ["java", "-XX:+UseParallelGC", "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", "-XX:+UseParallelGC", "-Dspring.profiles.active=docker", "org.springframework.boot.loader.launch.JarLauncher"]
