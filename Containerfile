@@ -8,8 +8,8 @@ RUN --mount=type=cache,target=/home/gradle/.gradle gradle dependencies --build-c
 COPY src ./src
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle build --build-cache
 ## Create custom jre using jdeps and jlink
-RUN jar xf build/libs/demo-1.0.0.jar
-RUN jdeps --ignore-missing-deps --print-module-deps -q --recursive --multi-release 21 --class-path 'BOOT-INF/lib/*' build/libs/demo-1.0.0.jar > deps.info
+RUN jar xf build/libs/jooq-spring-samples-1.0.0.jar
+RUN jdeps --ignore-missing-deps --print-module-deps -q --recursive --multi-release 21 --class-path 'BOOT-INF/lib/*' build/libs/jooq-spring-samples-1.0.0.jar > deps.info
 RUN jlink --add-modules $(cat deps.info) --strip-debug --compress 2 --no-header-files --no-man-pages --output /customjre
 
 
