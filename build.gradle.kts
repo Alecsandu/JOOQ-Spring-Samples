@@ -77,3 +77,10 @@ jooq {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir("${project.layout.buildDirectory.get()}/generated-sources/jooq/main")
+        }
+    }
+}
