@@ -15,10 +15,23 @@ services:
     networks:
       - demo-net
 
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "15433:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: t@t.t
+      PGADMIN_DEFAULT_PASSWORD: t
+    networks:
+      - demo-net
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin/
+
 networks:
   demo-net:
     driver: bridge
 
 volumes:
   postgres_data: {}
+  pgadmin_data: {}
 

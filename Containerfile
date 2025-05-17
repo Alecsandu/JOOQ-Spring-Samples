@@ -4,9 +4,9 @@ WORKDIR /opt/app
 ## Copy gradle build configs & settings ##
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
-RUN --mount=type=cache,target=/home/gradle/.gradle gradle dependencies --build-cache
+RUN --mount=type=cache,target=/home/gradle/.gradle gradle dependencies --build-cache --no-daemon
 COPY src ./src
-RUN --mount=type=cache,target=/home/gradle/.gradle gradle build --build-cache
+RUN --mount=type=cache,target=/home/gradle/.gradle gradle build --build-cache --no-daemon
 ## Create custom jre using jdeps and jlink
 RUN jar xf build/libs/jooq-spring-samples-1.0.0.jar
 RUN jdeps --ignore-missing-deps --print-module-deps -q --recursive --multi-release 21 --class-path 'BOOT-INF/lib/*' build/libs/jooq-spring-samples-1.0.0.jar > deps.info
