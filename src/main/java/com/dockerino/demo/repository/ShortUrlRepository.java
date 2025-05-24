@@ -1,0 +1,92 @@
+package com.dockerino.demo.repository;
+
+import com.dockerino.demo.model.ShortUrl;
+import com.dockerino.jooq.generated.tables.records.LinksRecord;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.dockerino.jooq.generated.tables.Links.LINKS;
+
+@Repository
+public class ShortUrlRepository {
+
+    private final DSLContext dsl;
+
+    @Autowired
+    public ShortUrlRepository(DSLContext dsl) {
+        this.dsl = dsl;
+    }
+
+    private ShortUrl mapRecordToShortUrl(Record r) {
+        if (r == null) return null;
+        return new ShortUrl(
+                r.get(LINKS.ID),
+                r.get(LINKS.SHORT_CODE),
+                r.get(LINKS.ORIGINAL_URL),
+                r.get(LINKS.USER_ID),
+                r.get(LINKS.CREATED_AT).toLocalDateTime()
+        );
+    }
+
+    Optional<ShortUrl> findById(Long id) {
+        Record record = dsl.selectFrom(LINKS)
+                .where(LINKS.ID.eq(id))
+                .fetchOne();
+        return Optional.ofNullable(mapRecordToShortUrl(record));
+    }
+
+    public Optional<ShortUrl> findByShortCode(String shortCode) {
+        Record record = dsl.selectFrom(LINKS)
+                .where(LINKS.SHORT_CODE.eq(shortCode))
+                .fetchOne();
+        return Optional.ofNullable(mapRecordToShortUrl(record));
+    }
+
+    public List<ShortUrl> findByUserOrderByCreatedAtDesc(UUID userId) {
+        Result<LinksRecord> records = dsl.selectFrom(LINKS)
+                .where(LINKS.USER_ID.eq(userId))
+                .orderBy(LINKS.CREATED_AT.desc())
+                .fetch();
+        return records.stream().map(this::mapRecordToShortUrl).collect(Collectors.toList());
+    }
+
+    public boolean existsByShortCode(String shortCode) {
+        return dsl.fetchExists(dsl.selectFrom(LINKS).where(LINKS.SHORT_CODE.eq(shortCode)));
+    }
+
+    @Transactional
+    public ShortUrl save(ShortUrl shortUrl) {
+        // Assuming new ShortUrls have null ID
+        if (shortUrl.getId() == null) {
+            // Insert (ID is BIGSERIAL, PostgresSQL will generate it)
+            // Or rely on DB default
+            return dsl.insertInto(LINKS)
+                    .set(LINKS.SHORT_CODE, shortUrl.getShortCode())
+                    .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
+                    .set(LINKS.USER_ID, shortUrl.getUserId())
+                    .set(LINKS.CREATED_AT, OffsetDateTime.now()) // Or rely on DB default
+                    .returningResult(LINKS.ID, LINKS.SHORT_CODE, LINKS.ORIGINAL_URL, LINKS.USER_ID, LINKS.CREATED_AT)
+                    .fetchOne(this::mapRecordToShortUrl);
+        } else {
+            // Update (less common for short URLs, but for completeness)
+            dsl.update(LINKS)
+                    .set(LINKS.SHORT_CODE, shortUrl.getShortCode())
+                    .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
+                    .set(LINKS.USER_ID, shortUrl.getUserId())
+                    // CREATED_AT typically not updated
+                    .where(LINKS.ID.eq(shortUrl.getId()))
+                    .execute();
+            return findById(shortUrl.getId()).orElseThrow(() -> new IllegalStateException("ShortUrl not found after update"));
+        }
+    }
+}

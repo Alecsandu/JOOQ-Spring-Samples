@@ -1,8 +1,23 @@
+server:
+  port: 8080
 spring:
   application:
-    name: "Demo APP with jOOQ, so cool, and Docker, waw"
-
+    name: "Demo APP with jOOQ"
   datasource:
     url: jdbc:postgresql://localhost:5432/jooq-demo
     username: postgres
     password: root
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_GOOGLE_CLIENT_ID
+            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            scope: email,profile
+app:
+  jwt:
+    secret: "XDmySuperSecretKeyThatIsVeryLongAndSecureAndRandom1234567890!@#$%^&*()_+"
+    expiration-ms: 86400000
+  oauth2:
+    redirect-uri: http://localhost:3000/oauth2/redirect
