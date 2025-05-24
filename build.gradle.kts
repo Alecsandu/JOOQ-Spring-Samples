@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.jooq.jooq-codegen-gradle") version "3.19.22"
+    //id("org.graalvm.buildtools.native") version "0.10.6"//jsonwebtoken is not fully native ready?(crynge)
 }
 
 group = "com.dockerino"
