@@ -3,7 +3,6 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.jooq.jooq-codegen-gradle") version "3.19.22"
-    //id("org.graalvm.buildtools.native") version "0.10.6"//jsonwebtoken is not fully native ready?(crynge)
 }
 
 group = "com.dockerino"
@@ -26,6 +25,8 @@ repositories {
 }
 
 val jjwtVersion = "0.12.6"
+val env: String? = System.getenv("BUILD_ENV")
+val dbHost: String = if (env.equals("container")) "postgres" else "localhost"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -64,7 +65,7 @@ jooq {
             generate {
                 jdbc {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://localhost:5432/jooq-demo"
+                    url = "jdbc:postgresql://${dbHost}:5432/jooq-demo"
                     username = "postgres"
                     password = "root"
                 }

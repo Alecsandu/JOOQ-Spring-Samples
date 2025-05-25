@@ -4,6 +4,7 @@ WORKDIR /opt/app
 ## Copy gradle build configs & settings ##
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
+ENV BUILD_ENV="container"
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle dependencies --build-cache --no-daemon
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle jooqCodegen --build-cache --no-daemon
 COPY src ./src
