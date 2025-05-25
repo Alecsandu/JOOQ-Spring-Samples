@@ -12,7 +12,7 @@ Samples that show different uses cases of jooq library with spring boot framewor
 
 ### Podman
 ```shell
-podman build -t java-jooq-spring:0.0.1 -f Containerfile
+podman build --network jooq-spring-samples_demo-net -t java-jooq-spring:0.0.1 -f Containerfile
 ```
 
 ### or Docker

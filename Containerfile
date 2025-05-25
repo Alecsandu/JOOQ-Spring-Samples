@@ -5,6 +5,7 @@ WORKDIR /opt/app
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle dependencies --build-cache --no-daemon
+RUN --mount=type=cache,target=/home/gradle/.gradle gradle jooqCodegen --build-cache --no-daemon
 COPY src ./src
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle build --build-cache --no-daemon
 ## Create custom jre using jdeps and jlink
