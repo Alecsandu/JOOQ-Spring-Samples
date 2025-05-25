@@ -68,8 +68,6 @@ public class ShortUrlRepository {
     public ShortUrl save(ShortUrl shortUrl) {
         // Assuming new ShortUrls have null ID
         if (shortUrl.getId() == null) {
-            // Insert (ID is BIGSERIAL, PostgresSQL will generate it)
-            // Or rely on DB default
             return dsl.insertInto(LINKS)
                     .set(LINKS.SHORT_CODE, shortUrl.getShortCode())
                     .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
@@ -78,12 +76,10 @@ public class ShortUrlRepository {
                     .returningResult(LINKS.ID, LINKS.SHORT_CODE, LINKS.ORIGINAL_URL, LINKS.USER_ID, LINKS.CREATED_AT)
                     .fetchOne(this::mapRecordToShortUrl);
         } else {
-            // Update (less common for short URLs, but for completeness)
             dsl.update(LINKS)
                     .set(LINKS.SHORT_CODE, shortUrl.getShortCode())
                     .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
                     .set(LINKS.USER_ID, shortUrl.getUserId())
-                    // CREATED_AT typically not updated
                     .where(LINKS.ID.eq(shortUrl.getId()))
                     .execute();
             return findById(shortUrl.getId()).orElseThrow(() -> new IllegalStateException("ShortUrl not found after update"));

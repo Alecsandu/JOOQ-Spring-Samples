@@ -91,17 +91,15 @@ public class UserRepository {
                     .returningResult(USERS.ID, USERS.EMAIL, USERS.USERNAME, USERS.PASSWORD, USERS.PROVIDER, USERS.PROVIDER_ID, USERS.CREATED_AT, USERS.UPDATED_AT)
                     .fetchOne(this::mapRecordToUser); // Map the returned record;
         } else {
-            // Update existing user
             dsl.update(USERS)
                     .set(USERS.EMAIL, user.getEmail())
                     .set(USERS.USERNAME, user.getUsername())
                     .set(USERS.PASSWORD, user.getPassword()) // Be careful about overwriting password unintentionally
                     .set(USERS.PROVIDER, user.getProvider() != null ? user.getProvider().name() : null)
                     .set(USERS.PROVIDER_ID, user.getProviderId())
-                    //.set(USERS.UPDATED_AT, OffsetDateTime.now()) // Or rely on DB trigger
+                    .set(USERS.UPDATED_AT, OffsetDateTime.now()) // Or rely on DB trigger
                     .where(USERS.ID.eq(user.getId()))
                     .execute();
-            // Fetch and return the updated user to get all fields, including DB-generated ones like updated_at
             return findById(user.getId()).orElseThrow(() -> new IllegalStateException("User not found after update"));
         }
     }
