@@ -22,16 +22,14 @@ import java.util.UUID;
 public class JwtTokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
-
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
-
-    @Value("${app.jwt.expiration-ms}")
-    private int jwtExpirationMs;
-
+    private final Integer jwtExpirationMs;
     private final SecretKey key;
 
-    public JwtTokenProvider(@Value("${app.jwt.secret}") String jwtSecret) {
+    public JwtTokenProvider(
+            @Value("${app.jwt.secret}") String jwtSecret,
+            @Value("${app.jwt.expiration-ms}") Integer jwtExpirationMs
+    ) {
+        this.jwtExpirationMs = jwtExpirationMs;
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
@@ -40,34 +38,32 @@ public class JwtTokenProvider {
         // If using CustomUserDetails which stores UUID
         UUID userId = ((CustomUserDetails) userPrincipal).getId();
 
-
         return Jwts.builder()
-                .setSubject(userId.toString()) // Store user ID as string
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
-    }
-    
-    public String generateTokenForOAuth2User(User user) {
-         return Jwts.builder()
-                .setSubject(user.getId().toString()) // Store user ID as string
-                .claim("email", user.getEmail()) // Optionally add email or other non-sensitive info
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS512)
+                .subject(userId.toString()) // Store user ID as string
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key, Jwts.SIG.HS512)
                 .compact();
     }
 
+    public String generateTokenForOAuth2User(User user) {
+        return Jwts.builder()
+                .subject(user.getId().toString()) // Store user ID as string
+                .claim("email", user.getEmail()) // Optionally add email or other non-sensitive info
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key, Jwts.SIG.HS512)
+                .compact();
+    }
 
     public UUID getUserIdFromJWT(String token) {
-        Claims claims = Jwts.parser().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
         return UUID.fromString(claims.getSubject());
     }
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().verifyWith(key).build().parseClaimsJws(authToken);
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(authToken);
             return true;
         } catch (SignatureException ex) {
             logger.error("Invalid JWT signature");
