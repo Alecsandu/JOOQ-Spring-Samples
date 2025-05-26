@@ -1,9 +1,8 @@
-package com.dockerino.demo.api;
+package com.dockerino.demo.shorturl;
 
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.model.dtos.ShortUrlRequest;
-import com.dockerino.demo.service.CustomUserDetails;
-import com.dockerino.demo.service.ShortUrlService;
+import com.dockerino.demo.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

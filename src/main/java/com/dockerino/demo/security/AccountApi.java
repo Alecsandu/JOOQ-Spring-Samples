@@ -1,11 +1,10 @@
-package com.dockerino.demo.api;
+package com.dockerino.demo.security;
 
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.AuthResponse;
 import com.dockerino.demo.model.dtos.LoginRequest;
 import com.dockerino.demo.model.dtos.RegisterRequest;
 import com.dockerino.demo.model.dtos.UserInfo;
-import com.dockerino.demo.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

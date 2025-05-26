@@ -1,6 +1,5 @@
-package com.dockerino.demo.config;
+package com.dockerino.demo.security;
 
-import com.dockerino.demo.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
