@@ -1,4 +1,4 @@
-package com.dockerino.demo.service;
+package com.dockerino.demo.security;
 
 import com.dockerino.demo.model.AuthProvider;
 import com.dockerino.demo.model.User;
@@ -30,9 +30,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String providerType = oAuth2UserRequest.getClientRegistration().getRegistrationId();
         AuthProvider provider = AuthProvider.valueOf(providerType.toUpperCase());
 
-        String providerId = null;
-        String email = null;
-        String name = null;
+        String providerId;
+        String email;
+        String name;
 
         if (provider.equals(AuthProvider.GOOGLE)) {
             providerId = (String) attributes.get("sub"); // Google's unique ID
@@ -68,7 +68,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setProviderId(providerId);
             user.setEmail(email);
             user.setUsername(name);
-            // Password can be null for OAuth2 users or set to a random secure value
+            // Password can be null for OAuth2 users or provide a way for user to set one up
         }
         user = userRepository.save(user);
         return CustomUserDetails.create(user, attributes);

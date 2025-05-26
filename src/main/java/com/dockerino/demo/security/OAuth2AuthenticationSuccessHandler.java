@@ -1,9 +1,7 @@
-package com.dockerino.demo.config;
+package com.dockerino.demo.security;
 
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.repository.UserRepository;
-import com.dockerino.demo.service.CustomUserDetails;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +20,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private JwtTokenProvider tokenProvider;
 
     @Autowired
-    private UserRepository userRepository; // To fetch full user if needed
+    private UserRepository userRepository;
 
     @Value("${app.oauth2.redirect-uri}")
     private String redirectUri;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         
         // Fetch the full user entity to ensure all fields like ID are populated correctly

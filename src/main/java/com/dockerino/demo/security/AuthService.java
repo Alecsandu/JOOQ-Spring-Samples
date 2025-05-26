@@ -1,6 +1,5 @@
-package com.dockerino.demo.service;
+package com.dockerino.demo.security;
 
-import com.dockerino.demo.config.JwtTokenProvider;
 import com.dockerino.demo.model.AuthProvider;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.AuthResponse;

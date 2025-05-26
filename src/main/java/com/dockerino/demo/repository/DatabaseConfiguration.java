@@ -1,4 +1,4 @@
-package com.dockerino.demo.config;
+package com.dockerino.demo.repository;
 
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 @Configuration
-public class DataConfig {
+public class DatabaseConfiguration {
 
     @Bean
     public DSLContext dslContext(DataSource dataSource) {

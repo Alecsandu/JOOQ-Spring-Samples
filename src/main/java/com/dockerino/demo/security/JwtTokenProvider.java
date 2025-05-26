@@ -1,7 +1,6 @@
-package com.dockerino.demo.config;
+package com.dockerino.demo.security;
 
 import com.dockerino.demo.model.User;
-import com.dockerino.demo.service.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;

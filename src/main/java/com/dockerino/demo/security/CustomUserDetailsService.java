@@ -1,4 +1,4 @@
-package com.dockerino.demo.service;
+package com.dockerino.demo.security;
 
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.repository.UserRepository;

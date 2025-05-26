@@ -1,7 +1,5 @@
-package com.dockerino.demo.config;
+package com.dockerino.demo.security;
 
-import com.dockerino.demo.service.CustomOAuth2UserService;
-import com.dockerino.demo.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
