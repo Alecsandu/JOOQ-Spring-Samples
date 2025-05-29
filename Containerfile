@@ -6,8 +6,8 @@ COPY build.gradle.kts .
 COPY settings.gradle.kts .
 ## ENV BUILD_ENV="container"  ## needed only if jooq is configured to generate by connecting to the db and using the db schema
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle dependencies --build-cache --no-daemon
-RUN --mount=type=cache,target=/home/gradle/.gradle gradle jooqCodegen --build-cache --no-daemon
 COPY src ./src
+RUN --mount=type=cache,target=/home/gradle/.gradle gradle jooqCodegen --build-cache --no-daemon
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle build --build-cache --no-daemon
 ## Create custom jre using jdeps and jlink
 RUN jar xf build/libs/jooq-spring-samples-1.0.0.jar
