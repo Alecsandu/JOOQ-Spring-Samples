@@ -4,7 +4,7 @@ WORKDIR /opt/app
 ## Copy gradle build configs & settings ##
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
-ENV BUILD_ENV="container"
+## ENV BUILD_ENV="container"  ## needed only if jooq is configured to generate by connecting to the db and using the db schema
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle dependencies --build-cache --no-daemon
 RUN --mount=type=cache,target=/home/gradle/.gradle gradle jooqCodegen --build-cache --no-daemon
 COPY src ./src
