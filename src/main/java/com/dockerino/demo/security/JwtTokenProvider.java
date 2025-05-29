@@ -34,11 +34,10 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-        // If using CustomUserDetails which stores UUID
         UUID userId = ((CustomUserDetails) userPrincipal).getId();
 
         return Jwts.builder()
-                .subject(userId.toString()) // Store user ID as string
+                .subject(userId.toString())
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key, Jwts.SIG.HS512)

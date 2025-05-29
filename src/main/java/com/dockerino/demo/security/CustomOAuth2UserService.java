@@ -39,7 +39,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             email = (String) attributes.get("email");
             name = (String) attributes.get("name");
         } else {
-            // Potentially handle other providers or throw an exception
             throw new OAuth2AuthenticationException("Unsupported provider: " + providerType);
         }
 
@@ -68,7 +67,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setProviderId(providerId);
             user.setEmail(email);
             user.setUsername(name);
-            // Password can be null for OAuth2 users or provide a way for user to set one up
         }
         user = userRepository.save(user);
         return CustomUserDetails.create(user, attributes);

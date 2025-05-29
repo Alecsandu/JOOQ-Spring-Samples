@@ -51,7 +51,7 @@ public class ShortUrlService {
     public String getOriginalUrl(String shortCode) {
         return shortUrlRepository.findByShortCode(shortCode)
                 .map(ShortUrl::getOriginalUrl)
-                .orElse(null); // Or throw an exception
+                .orElse(null);
     }
 
     @Transactional(readOnly = true)
