@@ -28,10 +28,10 @@ podman image prune -f
 ### Create container with Podman
 
 ```shell
-podman run -it --rm --network jooq-spring-samples_demo-net -p 8080:8080 java-jooq-spring:0.0.1
+podman run -it --rm --network jooq-spring-samples_demo-net --name jooq-service -p 8080:8080 java-jooq-spring:0.0.1
 ```
 
 or with docker
 ```shell
-docker run -it --rm --network jooq-spring-samples_demo-net -p 8080:8080 java-jooq-spring:0.0.1
+docker run -it --rm --network jooq-spring-samples_demo-net --name jooq-service -p 8080:8080 java-jooq-spring:0.0.1
 ```
