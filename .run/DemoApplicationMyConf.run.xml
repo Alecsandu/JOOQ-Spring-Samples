@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DemoApplicationMyConf" type="Application" factoryName="Application">
+    <envs>
+      <env name="POSTGRES_USERNAME" value="postgres" />
+      <env name="POSTGRES_PASSWORD" value="root" />
+      <env name="JWT_SECRET_KEY" value="mySuperSecretKeyThatIsVeryLongAndSecureAndRandom1790!@#$%^&amp;*()_+" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.dockerino.demo.DemoApplication" />
+    <module name="jooq-spring-samples.main" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.dockerino.demo.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
