@@ -6,6 +6,11 @@
 
 Samples that show different uses cases of jooq library with spring boot framework.
 
+### Security
+
+The authentication used is email&password + google SSO(to be enabled, configured and fully tested).
+Authorization is done via JWTs without server-side sessions.
+
 <hr/>
 
 ## Containerization
