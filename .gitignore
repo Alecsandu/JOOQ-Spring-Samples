@@ -40,3 +40,4 @@ out/
 /data/
 
 compose-prod.yml
+secrets.txt
