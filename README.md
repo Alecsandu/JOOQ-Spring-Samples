@@ -1,4 +1,4 @@
-# JOOQ with SPRING samples
+# JOOQ with Spring Boot samples
 
 <hr/>
 
