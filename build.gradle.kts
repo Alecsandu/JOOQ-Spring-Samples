@@ -2,7 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.jooq.jooq-codegen-gradle") version "3.19.23"
+    id("org.jooq.jooq-codegen-gradle") version "3.19.24"
 }
 
 group = "com.dockerino"
@@ -25,7 +25,7 @@ repositories {
 }
 
 val jjwtVersion = "0.12.6"
-val jooqVersion = "3.19.23"
+val jooqVersion = "3.19.24"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
