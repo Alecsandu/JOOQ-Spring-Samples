@@ -1,11 +1,10 @@
 package com.dockerino.demo.shorturl;
 
-import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.model.dtos.ShortUrlRequest;
+import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,35 +16,34 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/url")
 public class ShortUrlApi {
 
-    @Autowired
-    private ShortUrlService shortUrlService;
+    private final ShortUrlService shortUrlService;
 
-    @PostMapping("/api/urls")
-    public ResponseEntity<ShortUrlResponse> shortenUrl(
-            @Valid @RequestBody ShortUrlRequest shortenRequest,
-            @AuthenticationPrincipal CustomUserDetails currentUser,
-            HttpServletRequest request
+    public ShortUrlApi(ShortUrlService shortUrlService) {
+        this.shortUrlService = shortUrlService;
+    }
+
+    @PostMapping
+    public ResponseEntity<ShortUrlResponse> createShortUrl(
+            @Valid @RequestBody ShortUrlRequest shortenRequest, @AuthenticationPrincipal CustomUserDetails currentUser, HttpServletRequest request
     ) {
-        ShortUrlResponse response = shortUrlService.createShortUrl(
-                shortenRequest.getOriginalUrl(),
-                currentUser.getId(),
-                request
-        );
+        ShortUrlResponse response = shortUrlService.createShortUrl(shortenRequest.getOriginalUrl(), currentUser.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{shortCode}")
-    public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String shortCode) {
+    public ResponseEntity<Void> getOriginalUrlByShortCode(@PathVariable String shortCode) {
         String originalUrl = shortUrlService.getOriginalUrl(shortCode);
+
         if (originalUrl == null) {
             return ResponseEntity.notFound().build();
         }
-
         if (!originalUrl.matches("^https?://.*")) {
             originalUrl = "https://" + originalUrl;
         }
+
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))
                 .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
@@ -55,12 +53,11 @@ public class ShortUrlApi {
     }
 
     @Secured({"ROLE_USER"})
-    @GetMapping("/api/urls/my-urls")
-    public ResponseEntity<List<ShortUrlResponse>> getMyUrls(
-            @AuthenticationPrincipal CustomUserDetails currentUser,
-            HttpServletRequest request
+    @GetMapping("/all")
+    public ResponseEntity<List<ShortUrlResponse>> getShortUrlsByUserId(
+            @AuthenticationPrincipal CustomUserDetails currentUser, HttpServletRequest request
     ) {
-        List<ShortUrlResponse> myUrls = shortUrlService.getUserUrls(currentUser.getId(), request);
-        return ResponseEntity.ok(myUrls);
+        List<ShortUrlResponse> urlsByUserId = shortUrlService.getUserUrls(currentUser.getId(), request);
+        return ResponseEntity.ok(urlsByUserId);
     }
 }

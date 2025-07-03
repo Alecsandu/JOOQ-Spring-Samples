@@ -4,7 +4,6 @@ import com.dockerino.demo.model.AuthProvider;
 import com.dockerino.demo.model.User;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
@@ -18,7 +17,6 @@ public class UserRepository {
 
     private final DSLContext dsl;
 
-    @Autowired
     public UserRepository(DSLContext dsl) {
         this.dsl = dsl;
     }

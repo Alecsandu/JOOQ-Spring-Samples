@@ -6,7 +6,6 @@ import com.dockerino.demo.model.dtos.LoginRequest;
 import com.dockerino.demo.model.dtos.RegisterRequest;
 import com.dockerino.demo.model.dtos.UserInfo;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AccountApi {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public AccountApi(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
