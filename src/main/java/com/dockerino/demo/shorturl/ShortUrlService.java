@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -48,10 +49,9 @@ public class ShortUrlService {
     }
 
     @Transactional(readOnly = true)
-    public String getOriginalUrl(String shortCode) {
+    public Optional<String> getOriginalUrl(String shortCode) {
         return shortUrlRepository.findByShortCode(shortCode)
-                .map(ShortUrl::getOriginalUrl)
-                .orElse(null);
+                .map(ShortUrl::getOriginalUrl);
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +61,7 @@ public class ShortUrlService {
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 
-        return shortUrlRepository.findByUserOrderByCreatedAtDesc(user.getId()).stream()
+        return shortUrlRepository.findByUserId(user.getId()).stream()
                 .map(su -> new ShortUrlResponse(su.getShortCode(), su.getOriginalUrl(), baseUrl + "/" + su.getShortCode()))
                 .collect(Collectors.toList());
     }

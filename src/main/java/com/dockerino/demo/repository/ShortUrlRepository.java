@@ -5,7 +5,6 @@ import com.dockerino.jooq.generated.tables.records.LinksRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ public class ShortUrlRepository {
 
     private final DSLContext dsl;
 
-    @Autowired
     public ShortUrlRepository(DSLContext dsl) {
         this.dsl = dsl;
     }
@@ -52,7 +50,7 @@ public class ShortUrlRepository {
         return Optional.ofNullable(mapRecordToShortUrl(record));
     }
 
-    public List<ShortUrl> findByUserOrderByCreatedAtDesc(UUID userId) {
+    public List<ShortUrl> findByUserId(UUID userId) {
         Result<LinksRecord> records = dsl.selectFrom(LINKS)
                 .where(LINKS.USER_ID.eq(userId))
                 .orderBy(LINKS.CREATED_AT.desc())
@@ -66,13 +64,12 @@ public class ShortUrlRepository {
 
     @Transactional
     public ShortUrl save(ShortUrl shortUrl) {
-        // Assuming new ShortUrls have null ID
         if (shortUrl.getId() == null) {
             return dsl.insertInto(LINKS)
                     .set(LINKS.SHORT_CODE, shortUrl.getShortCode())
                     .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
                     .set(LINKS.USER_ID, shortUrl.getUserId())
-                    .set(LINKS.CREATED_AT, OffsetDateTime.now()) // Or rely on DB default
+                    .set(LINKS.CREATED_AT, OffsetDateTime.now())
                     .returningResult(LINKS.ID, LINKS.SHORT_CODE, LINKS.ORIGINAL_URL, LINKS.USER_ID, LINKS.CREATED_AT)
                     .fetchOne(this::mapRecordToShortUrl);
         } else {
