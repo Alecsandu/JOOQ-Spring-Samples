@@ -1,6 +1,5 @@
 package com.dockerino.demo.security;
 
-import com.dockerino.demo.model.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -38,16 +37,6 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .subject(userId.toString())
-                .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key, Jwts.SIG.HS512)
-                .compact();
-    }
-
-    public String generateTokenForOAuth2User(User user) {
-        return Jwts.builder()
-                .subject(user.getId().toString()) // Store user ID as string
-                .claim("email", user.getEmail()) // Optionally add email or other non-sensitive info
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key, Jwts.SIG.HS512)

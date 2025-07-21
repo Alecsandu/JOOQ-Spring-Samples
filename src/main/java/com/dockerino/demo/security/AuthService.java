@@ -1,6 +1,5 @@
 package com.dockerino.demo.security;
 
-import com.dockerino.demo.model.AuthProvider;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.AuthResponse;
 import com.dockerino.demo.model.dtos.LoginRequest;
@@ -53,7 +52,6 @@ public class AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setUsername(registerRequest.getUsername());
-        user.setProvider(AuthProvider.LOCAL);
 
         return userRepository.save(user);
     }

@@ -2,24 +2,23 @@ package com.dockerino.demo.security;
 
 import com.dockerino.demo.model.User;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
-public class CustomUserDetails implements UserDetails, OAuth2User {
+public class CustomUserDetails implements UserDetails {
     private final UUID id;
     private final String email;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
-    @Setter
-    private Map<String, Object> attributes; // For OAuth2
 
-    public CustomUserDetails(UUID id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    private CustomUserDetails(UUID id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -35,28 +34,9 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 authorities
         );
     }
-    
-    // For OAuth2
-    public static CustomUserDetails create(User user, Map<String, Object> attributes) {
-        CustomUserDetails userDetails = CustomUserDetails.create(user);
-        userDetails.setAttributes(attributes);
-        return userDetails;
-    }
-
 
     @Override
     public String getUsername() {
-        return email; // Using email as username
-    }
-
-    // OAuth2User methods
-    @Override
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
-
-    @Override
-    public String getName() { // Required by OAuth2User
-        return String.valueOf(id); // Or user.getName() if you have it
+        return email;
     }
 }
