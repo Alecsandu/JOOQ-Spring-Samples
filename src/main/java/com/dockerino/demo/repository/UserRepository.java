@@ -5,7 +5,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,22 +53,11 @@ public class UserRepository {
     }
 
     public User save(User user) {
-        if (user.getId() == null || !dsl.fetchExists(dsl.selectFrom(USERS).where(USERS.ID.eq(user.getId())))) {
-            return dsl.insertInto(USERS)
-                    .set(USERS.EMAIL, user.getEmail())
-                    .set(USERS.USERNAME, user.getUsername())
-                    .set(USERS.PASSWORD, user.getPassword())
-                    .returningResult(USERS.EMAIL, USERS.USERNAME, USERS.PASSWORD)
-                    .fetchOne(this::mapRecordToUser);
-        } else {
-            dsl.update(USERS)
-                    .set(USERS.EMAIL, user.getEmail())
-                    .set(USERS.USERNAME, user.getUsername())
-                    .set(USERS.PASSWORD, user.getPassword())
-                    .set(USERS.UPDATED_AT, OffsetDateTime.now())
-                    .where(USERS.ID.eq(user.getId()))
-                    .execute();
-            return findById(user.getId()).orElseThrow(() -> new IllegalStateException("User not found after update"));
-        }
+        return dsl.insertInto(USERS)
+                .set(USERS.EMAIL, user.getEmail())
+                .set(USERS.USERNAME, user.getUsername())
+                .set(USERS.PASSWORD, user.getPassword())
+                .returningResult(USERS.EMAIL, USERS.USERNAME, USERS.PASSWORD)
+                .fetchOne(this::mapRecordToUser);
     }
 }
