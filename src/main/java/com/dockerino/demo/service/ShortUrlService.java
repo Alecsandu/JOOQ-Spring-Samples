@@ -1,4 +1,4 @@
-package com.dockerino.demo.shorturl;
+package com.dockerino.demo.service;
 
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.demo.model.User;

@@ -1,7 +1,6 @@
 package com.dockerino.demo.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -12,7 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.crypto.SecretKey;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
@@ -21,14 +24,27 @@ public class JwtTokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private final Integer jwtExpirationMs;
-    private final SecretKey key;
+    private final KeyPair keyChain;
+    private static final String SIG_ALGORITHM = "Ed25519";
 
     public JwtTokenProvider(
-            @Value("${app.jwt.secret}") String jwtSecret,
-            @Value("${app.jwt.expiration-ms}") Integer jwtExpirationMs
-    ) {
+            @Value("${app.jwt.expiration-ms}") Integer jwtExpirationMs,
+            @Value("${app.jwt.public-key-b64}") String publicKeyB64,
+            @Value("${app.jwt.private-key-b64}") String privateKeyB64
+    ) throws NoSuchAlgorithmException, InvalidKeySpecException {
         this.jwtExpirationMs = jwtExpirationMs;
-        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
+        KeyFactory keyFactory = KeyFactory.getInstance(SIG_ALGORITHM);
+        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyB64);
+        byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyB64);
+
+        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+
+        keyChain = new KeyPair(publicKey, privateKey);
     }
 
     public String generateToken(Authentication authentication) {
@@ -39,18 +55,18 @@ public class JwtTokenProvider {
                 .subject(userId.toString())
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key, Jwts.SIG.HS512)
+                .signWith(keyChain.getPrivate(), Jwts.SIG.EdDSA)
                 .compact();
     }
 
     public UUID getUserIdFromJWT(String token) {
-        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        Claims claims = Jwts.parser().verifyWith(keyChain.getPublic()).build().parseSignedClaims(token).getPayload();
         return UUID.fromString(claims.getSubject());
     }
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(authToken);
+            Jwts.parser().verifyWith(keyChain.getPublic()).build().parseSignedClaims(authToken);
             return true;
         } catch (SignatureException ex) {
             logger.error("Invalid JWT signature");

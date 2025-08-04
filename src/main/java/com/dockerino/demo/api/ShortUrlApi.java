@@ -1,8 +1,9 @@
-package com.dockerino.demo.shorturl;
+package com.dockerino.demo.api;
 
 import com.dockerino.demo.model.dtos.ShortUrlRequest;
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.security.CustomUserDetails;
+import com.dockerino.demo.service.ShortUrlService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;

@@ -81,19 +81,6 @@ jooq {
 
             }
             generate {
-                /*
-                // For generating directly from the db schema
-                //
-                //val env: String? = System.getenv("BUILD_ENV")
-                //val dbHost: String = if (env.equals("container")) "postgres" else "localhost"
-
-                jdbc {
-                    driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://${dbHost}:5432/jooq-demo"
-                    username = "postgres"
-                    password = "root"
-                }
-                */
                 withJooqVersionReference(true)
             }
             target {
