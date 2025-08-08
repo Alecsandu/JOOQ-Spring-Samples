@@ -29,8 +29,8 @@ public class JwtTokenProvider {
 
     public JwtTokenProvider(
             @Value("${app.jwt.expiration-ms}") Integer jwtExpirationMs,
-            @Value("${app.jwt.public-key-b64}") String publicKeyB64,
-            @Value("${app.jwt.private-key-b64}") String privateKeyB64
+            @Value("${app.jwt.public-key}") String publicKeyB64,
+            @Value("${app.jwt.private-key}") String privateKeyB64
     ) throws NoSuchAlgorithmException, InvalidKeySpecException {
         this.jwtExpirationMs = jwtExpirationMs;
 
