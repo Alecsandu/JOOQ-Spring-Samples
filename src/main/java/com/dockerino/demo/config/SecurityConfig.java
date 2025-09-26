@@ -1,5 +1,7 @@
-package com.dockerino.demo.security;
+package com.dockerino.demo.config;
 
+import com.dockerino.demo.security.CustomUserDetailsService;
+import com.dockerino.demo.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

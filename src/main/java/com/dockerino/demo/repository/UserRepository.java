@@ -1,8 +1,10 @@
 package com.dockerino.demo.repository;
 
 import com.dockerino.demo.model.User;
+import com.dockerino.jooq.generated.tables.records.UsersRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -20,7 +22,10 @@ public class UserRepository {
     }
 
     private User mapRecordToUser(Record r) {
-        if (r == null) return null;
+        if (r == null) {
+            return null;
+        }
+
         User user = new User();
         user.setId(r.get(USERS.ID));
         user.setEmail(r.get(USERS.EMAIL));
@@ -28,6 +33,7 @@ public class UserRepository {
         user.setUsername(r.get(USERS.EMAIL));
         user.setCreatedAt(r.get(USERS.CREATED_AT).toLocalDateTime());
         user.setUpdatedAt(r.get(USERS.UPDATED_AT).toLocalDateTime());
+
         return user;
     }
 
@@ -35,6 +41,7 @@ public class UserRepository {
         Record record = dsl.selectFrom(USERS)
                 .where(USERS.ID.eq(id))
                 .fetchOne();
+
         return Optional.ofNullable(mapRecordToUser(record));
     }
 
@@ -42,14 +49,15 @@ public class UserRepository {
         Record record = dsl.selectFrom(USERS)
                 .where(USERS.EMAIL.eq(email))
                 .fetchOne();
+
         return Optional.ofNullable(mapRecordToUser(record));
     }
 
     public Boolean existsByEmail(String email) {
-        return dsl.fetchExists(
-                dsl.selectFrom(USERS)
-                        .where(USERS.EMAIL.eq(email))
-        );
+        Select<UsersRecord> usersSelect = dsl.selectFrom(USERS)
+                .where(USERS.EMAIL.eq(email));
+
+        return dsl.fetchExists(usersSelect);
     }
 
     public User save(User user) {

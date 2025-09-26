@@ -1,4 +1,4 @@
-package com.dockerino.demo.repository;
+package com.dockerino.demo.config;
 
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
