@@ -7,17 +7,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/jooq-demo
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
-            scope: email,profile
 app:
   jwt:
-    secret: ${JWT_SECRET_KEY}
+    public-key: ${PUBLIC_KEY}
+    private-key: ${PRIVATE_KEY}
     expiration-ms: 300000
-  oauth2:
-    redirect-uri: http://localhost:3000/oauth2/redirect

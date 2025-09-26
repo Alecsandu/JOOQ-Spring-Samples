@@ -1,9 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DemoApplicationMyConf" type="Application" factoryName="Application">
     <envs>
-      <env name="POSTGRES_USERNAME" value="postgres" />
-      <env name="POSTGRES_PASSWORD" value="root" />
       <env name="JWT_SECRET_KEY" value="mySuperSecretKeyThatIsVeryLongAndSecureAndRandom1790!@#$%^&amp;*()_+" />
+      <env name="POSTGRES_PASSWORD" value="root" />
+      <env name="POSTGRES_USERNAME" value="postgres" />
+      <env name="PRIVATE_KEY" value="MC4CAQAwBQYDK2VwBCIEIMpZKQfEL+UftePlnhKyYAEEwS7ny8mHMkpqL8zkb5jW" />
+      <env name="PUBLIC_KEY" value="MCowBQYDK2VwAyEAuogQm+gF7vHmEyYrXeVIlFt7xyifg8NGVp6KiL35tow=" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.dockerino.demo.DemoApplication" />
     <module name="jooq-spring-samples.main" />

@@ -1,8 +1,8 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.5.3"
+    id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.jooq.jooq-codegen-gradle") version "3.19.24"
+    id("org.jooq.jooq-codegen-gradle") version "3.19.26"
 }
 
 group = "com.dockerino"
@@ -10,7 +10,7 @@ version = "1.0.0"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -24,13 +24,12 @@ repositories {
     mavenCentral()
 }
 
-val jjwtVersion = "0.12.6"
-val jooqVersion = "3.19.24"
+val jjwtVersion = "0.13.0"
+val jooqVersion = "3.19.26"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-jooq")
 
@@ -82,19 +81,6 @@ jooq {
 
             }
             generate {
-                /*
-                // For generating directly from the db schema
-                //
-                //val env: String? = System.getenv("BUILD_ENV")
-                //val dbHost: String = if (env.equals("container")) "postgres" else "localhost"
-
-                jdbc {
-                    driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://${dbHost}:5432/jooq-demo"
-                    username = "postgres"
-                    password = "root"
-                }
-                */
                 withJooqVersionReference(true)
             }
             target {

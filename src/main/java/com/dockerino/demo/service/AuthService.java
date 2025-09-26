@@ -1,12 +1,13 @@
-package com.dockerino.demo.security;
+package com.dockerino.demo.service;
 
-import com.dockerino.demo.model.AuthProvider;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.AuthResponse;
 import com.dockerino.demo.model.dtos.LoginRequest;
 import com.dockerino.demo.model.dtos.RegisterRequest;
 import com.dockerino.demo.model.dtos.UserInfo;
 import com.dockerino.demo.repository.UserRepository;
+import com.dockerino.demo.security.CustomUserDetails;
+import com.dockerino.demo.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -53,7 +54,6 @@ public class AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setUsername(registerRequest.getUsername());
-        user.setProvider(AuthProvider.LOCAL);
 
         return userRepository.save(user);
     }

@@ -12,10 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ShortUrl {
 
-    private Long id; // Assuming this was BIGSERIAL, so Long
+    private Long id;
     private String shortCode;
     private String originalUrl;
-    private UUID userId; // Store user's ID directly
+    private UUID userId;
     private LocalDateTime createdAt;
 
     public ShortUrl(String shortCode, String originalUrl, UUID userId) {

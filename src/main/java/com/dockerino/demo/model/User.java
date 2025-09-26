@@ -16,22 +16,11 @@ public class User {
 
     private String email;
 
-    private String password; // Nullable for OAuth2 users
+    private String password;
 
-    private AuthProvider provider;
-
-    private String providerId; // e.g., Google's subject ID
-
-    private String username; // Name from Google or set manually
+    private String username;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-    public User(String email, String password, String username, AuthProvider provider) {
-        this.email = email;
-        this.password = password;
-        this.username = username;
-        this.provider = provider;
-    }
 }
