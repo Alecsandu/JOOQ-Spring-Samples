@@ -2,9 +2,9 @@ package com.dockerino.demo.model.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
@@ -14,9 +14,10 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank
-    @Size(min = 14, max = 128)
+    @Length(min = 14, max = 128)
     private String password;
 
     @NotBlank
+    @Length(min = 5, max = 255)
     private String username;
 }

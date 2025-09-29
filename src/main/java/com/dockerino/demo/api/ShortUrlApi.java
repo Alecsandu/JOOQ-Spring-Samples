@@ -2,14 +2,12 @@ package com.dockerino.demo.api;
 
 import com.dockerino.demo.model.dtos.ShortUrlRequest;
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
-import com.dockerino.demo.security.CustomUserDetails;
 import com.dockerino.demo.service.ShortUrlService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -26,8 +24,8 @@ public class ShortUrlApi {
     }
 
     @PostMapping
-    public ResponseEntity<ShortUrlResponse> createShortUrl(@Valid @RequestBody ShortUrlRequest shortenRequest, @AuthenticationPrincipal CustomUserDetails currentUser, HttpServletRequest request) {
-        ShortUrlResponse response = shortUrlService.createShortUrl(shortenRequest.getOriginalUrl(), currentUser.getId(), request);
+    public ResponseEntity<ShortUrlResponse> createShortUrl(@Valid @RequestBody ShortUrlRequest shortenRequest, HttpServletRequest request) {
+        ShortUrlResponse response = shortUrlService.createShortUrl(shortenRequest.getOriginalUrl(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -44,8 +42,8 @@ public class ShortUrlApi {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ShortUrlResponse>> getShortUrlsByUserId(@AuthenticationPrincipal CustomUserDetails currentUser, HttpServletRequest request) {
-        List<ShortUrlResponse> urlsByUserId = shortUrlService.getUserUrls(currentUser.getId(), request);
+    public ResponseEntity<List<ShortUrlResponse>> getShortUrlsByUserId(HttpServletRequest request) {
+        List<ShortUrlResponse> urlsByUserId = shortUrlService.getUserUrls(request);
         return ResponseEntity.ok(urlsByUserId);
     }
 }
