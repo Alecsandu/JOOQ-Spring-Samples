@@ -1,10 +1,6 @@
 package com.dockerino.demo.api;
 
-import com.dockerino.demo.model.User;
-import com.dockerino.demo.model.dtos.AuthResponse;
-import com.dockerino.demo.model.dtos.LoginRequest;
-import com.dockerino.demo.model.dtos.RegisterRequest;
-import com.dockerino.demo.model.dtos.UserInfo;
+import com.dockerino.demo.model.dtos.*;
 import com.dockerino.demo.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -24,18 +20,14 @@ public class AccountApi {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        AuthResponse authResponse = authService.loginUser(loginRequest);
-        return ResponseEntity.ok(authResponse);
+    public ResponseEntity<BasicLoginResponse> login(@Valid @RequestBody BasicLoginRequest basicLoginRequest) {
+        BasicLoginResponse basicLoginResponse = authService.loginUser(basicLoginRequest);
+        return ResponseEntity.ok(basicLoginResponse);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        try {
-            User result = authService.registerUser(registerRequest);
-            return ResponseEntity.ok(new UserInfo(result.getId(), result.getEmail(), result.getUsername()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        RegisterResponse registerResponse = authService.registerUser(registerRequest);
+        return ResponseEntity.ok(registerResponse);
     }
 }

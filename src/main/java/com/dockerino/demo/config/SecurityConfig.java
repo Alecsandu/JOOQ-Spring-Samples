@@ -26,7 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.security.SecureRandom;
 
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true) // For @Secured & @RolesAllowed.
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true) // Lets us use @Secured and @RolesAllowed
 @Configuration
 public class SecurityConfig {
 

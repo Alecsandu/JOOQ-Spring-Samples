@@ -65,7 +65,7 @@ public class UserRepository {
                 .set(USERS.EMAIL, user.getEmail())
                 .set(USERS.USERNAME, user.getUsername())
                 .set(USERS.PASSWORD, user.getPassword())
-                .returningResult(USERS.EMAIL, USERS.USERNAME, USERS.PASSWORD)
+                .returning()
                 .fetchOne(this::mapRecordToUser);
     }
 }
