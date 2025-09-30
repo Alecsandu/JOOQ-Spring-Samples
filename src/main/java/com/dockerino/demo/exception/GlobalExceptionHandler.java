@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({AuthenticationException.class})
+    @ExceptionHandler({AuthenticationException.class, InvalidTokenException.class})
     public ResponseEntity<String> handle(AuthenticationException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }

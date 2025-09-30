@@ -1,5 +1,6 @@
 package com.dockerino.demo.repository;
 
+import com.dockerino.demo.exception.ShortUrlNotFoundException;
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.jooq.generated.tables.records.LinksRecord;
 import org.jooq.DSLContext;
@@ -80,7 +81,7 @@ public class ShortUrlRepository {
                     .set(LINKS.USER_ID, shortUrl.getUserId())
                     .where(LINKS.ID.eq(shortUrl.getId()))
                     .execute();
-            return findById(shortUrl.getId()).orElseThrow(() -> new IllegalStateException("ShortUrl not found after update"));
+            return findById(shortUrl.getId()).orElseThrow(ShortUrlNotFoundException::new);
         }
     }
 }
