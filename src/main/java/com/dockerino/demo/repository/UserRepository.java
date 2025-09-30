@@ -7,6 +7,7 @@ import org.jooq.Record;
 import org.jooq.Select;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,12 +28,12 @@ public class UserRepository {
         }
 
         User user = new User();
-        user.setId(r.get(USERS.ID));
-        user.setEmail(r.get(USERS.EMAIL));
-        user.setPassword(r.get(USERS.PASSWORD));
-        user.setUsername(r.get(USERS.EMAIL));
-        user.setCreatedAt(r.get(USERS.CREATED_AT).toLocalDateTime());
-        user.setUpdatedAt(r.get(USERS.UPDATED_AT).toLocalDateTime());
+        user.setId(r.get(USERS.ID, UUID.class));
+        user.setEmail(r.get(USERS.EMAIL, String.class));
+        user.setPassword(r.get(USERS.PASSWORD, String.class));
+        user.setUsername(r.get(USERS.EMAIL, String.class));
+        user.setCreatedAt(r.get(USERS.CREATED_AT, LocalDateTime.class));
+        user.setUpdatedAt(r.get(USERS.UPDATED_AT, LocalDateTime.class));
 
         return user;
     }

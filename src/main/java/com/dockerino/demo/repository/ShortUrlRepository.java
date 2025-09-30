@@ -8,6 +8,7 @@ import org.jooq.Result;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +29,11 @@ public class ShortUrlRepository {
     private ShortUrl mapRecordToShortUrl(Record r) {
         if (r == null) return null;
         return new ShortUrl(
-                r.get(LINKS.ID),
-                r.get(LINKS.SHORT_CODE),
-                r.get(LINKS.ORIGINAL_URL),
-                r.get(LINKS.USER_ID),
-                r.get(LINKS.CREATED_AT).toLocalDateTime()
+                r.get(LINKS.ID, Long.class),
+                r.get(LINKS.SHORT_CODE, String.class),
+                r.get(LINKS.ORIGINAL_URL, String.class),
+                r.get(LINKS.USER_ID, UUID.class),
+                r.get(LINKS.CREATED_AT, LocalDateTime.class)
         );
     }
 
@@ -70,7 +71,7 @@ public class ShortUrlRepository {
                     .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
                     .set(LINKS.USER_ID, shortUrl.getUserId())
                     .set(LINKS.CREATED_AT, OffsetDateTime.now())
-                    .returningResult(LINKS.ID, LINKS.SHORT_CODE, LINKS.ORIGINAL_URL, LINKS.USER_ID, LINKS.CREATED_AT)
+                    .returning()
                     .fetchOne(this::mapRecordToShortUrl);
         } else {
             dsl.update(LINKS)
