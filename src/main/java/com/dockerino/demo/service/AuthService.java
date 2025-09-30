@@ -75,7 +75,7 @@ public class AuthService {
     @Transactional
     public RegisterResponse registerUser(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new AuthenticationException("Email address already in use.");
+            throw new AuthenticationException("Email is used");
         }
 
         User user = new User();
