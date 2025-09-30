@@ -1,53 +1,81 @@
 package com.dockerino.demo.service;
 
+import com.dockerino.demo.exception.AuthenticationException;
 import com.dockerino.demo.model.User;
-import com.dockerino.demo.model.dtos.AuthResponse;
-import com.dockerino.demo.model.dtos.LoginRequest;
-import com.dockerino.demo.model.dtos.RegisterRequest;
-import com.dockerino.demo.model.dtos.UserInfo;
+import com.dockerino.demo.model.dtos.*;
 import com.dockerino.demo.repository.UserRepository;
 import com.dockerino.demo.security.CustomUserDetails;
-import com.dockerino.demo.security.JwtTokenProvider;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.dockerino.demo.security.CustomUserDetailsService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService customUserDetailsService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider tokenProvider;
+    private final JwtEncoder jwtEncoder;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider) {
-        this.authenticationManager = authenticationManager;
+    public AuthService(CustomUserDetailsService customUserDetailsService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder) {
+        this.customUserDetailsService = customUserDetailsService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.tokenProvider = tokenProvider;
+        this.jwtEncoder = jwtEncoder;
     }
 
     @Transactional
-    public AuthResponse loginUser(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    public BasicLoginResponse loginUser(BasicLoginRequest basicLoginRequest) {
+        CustomUserDetails userDetails;
+        try {
+            userDetails = ((CustomUserDetails) customUserDetailsService.loadUserByUsername(basicLoginRequest.getEmail()));
+        } catch (UsernameNotFoundException e) {
+            throw new AuthenticationException(e);
+        }
+
+        if (!passwordEncoder.matches(basicLoginRequest.getPassword(), userDetails.getPassword())) {
+            throw new AuthenticationException("Invalid credentials!");
+        }
+
         UserInfo userInfo = new UserInfo(userDetails.getId(), userDetails.getEmail(), userDetails.getUsername());
 
-        return new AuthResponse(jwt, userInfo);
+        Instant now = Instant.now();
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(userInfo.id().toString())
+                .issuer("http://localhost:8080")
+                .issuedAt(now)
+                .expiresAt(now.plus(1, ChronoUnit.HOURS))
+                .claim("scope", extractPermissions(userDetails))
+                .build();
+
+        String jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+        return new BasicLoginResponse(jwt, userInfo);
+    }
+
+    private String extractPermissions(UserDetails userDetails) {
+        return userDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(" "));
     }
 
     @Transactional
-    public User registerUser(RegisterRequest registerRequest) {
+    public RegisterResponse registerUser(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new IllegalArgumentException("Email address already in use.");
+            throw new AuthenticationException("Email is used");
         }
 
         User user = new User();
@@ -55,6 +83,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setUsername(registerRequest.getUsername());
 
-        return userRepository.save(user);
+        User createdUser = userRepository.save(user);
+
+        return new RegisterResponse(createdUser.getId(), createdUser.getEmail(), createdUser.getUsername());
     }
 }
