@@ -1,7 +1,6 @@
 package com.dockerino.demo.security;
 
 import com.dockerino.demo.model.User;
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
 public class CustomUserDetails implements UserDetails {
     private final UUID id;
     private final String email;
@@ -28,11 +26,25 @@ public class CustomUserDetails implements UserDetails {
     public static CustomUserDetails create(User user) {
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
         return new CustomUserDetails(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
+                user.id(),
+                user.email(),
+                user.password(),
                 authorities
         );
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     @Override

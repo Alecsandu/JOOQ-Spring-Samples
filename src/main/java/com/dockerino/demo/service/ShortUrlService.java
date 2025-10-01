@@ -47,17 +47,16 @@ public class ShortUrlService {
             shortCode = generateShortCode();
         } while (shortUrlRepository.existsByShortCode(shortCode));
 
-        ShortUrl shortUrl = new ShortUrl(shortCode, originalUrl, user.getId());
-        shortUrl = shortUrlRepository.save(shortUrl);
+        ShortUrl shortUrl = shortUrlRepository.save(shortCode, originalUrl, user.id());
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-        return new ShortUrlResponse(shortCode, originalUrl, baseUrl + "/" + shortUrl.getShortCode());
+        return new ShortUrlResponse(shortCode, originalUrl, baseUrl + "/" + shortUrl.shortCode());
     }
 
     @Transactional(readOnly = true)
     public Optional<String> getOriginalUrl(String shortCode) {
         return shortUrlRepository.findByShortCode(shortCode)
-                .map(ShortUrl::getOriginalUrl);
+                .map(ShortUrl::originalUrl);
     }
 
     @Transactional(readOnly = true)
@@ -68,8 +67,8 @@ public class ShortUrlService {
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 
-        return shortUrlRepository.findByUserId(user.getId()).stream()
-                .map(su -> new ShortUrlResponse(su.getShortCode(), su.getOriginalUrl(), baseUrl + "/" + su.getShortCode()))
+        return shortUrlRepository.findByUserId(user.id()).stream()
+                .map(su -> new ShortUrlResponse(su.shortCode(), su.originalUrl(), baseUrl + "/" + su.shortCode()))
                 .collect(Collectors.toList());
     }
 
@@ -78,7 +77,7 @@ public class ShortUrlService {
 
         Jwt jwt = jwtDecoder.decode(token);
 
-        return UUID.fromString(jwt.getClaim("sub"));
+        return UUID.fromString(jwt.getClaim("jti"));
     }
 
     private String extractTokenFromHeader(HttpServletRequest request) {

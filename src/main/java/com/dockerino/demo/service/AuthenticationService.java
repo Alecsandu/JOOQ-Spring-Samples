@@ -21,14 +21,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 @Service
-public class AuthService {
+public class AuthenticationService {
 
+    private static final Long TOKEN_VALID_TIME = 5L;
     private final CustomUserDetailsService customUserDetailsService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
 
-    public AuthService(CustomUserDetailsService customUserDetailsService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder) {
+    public AuthenticationService(CustomUserDetailsService customUserDetailsService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder) {
         this.customUserDetailsService = customUserDetailsService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -39,23 +40,23 @@ public class AuthService {
     public BasicLoginResponse loginUser(BasicLoginRequest basicLoginRequest) {
         CustomUserDetails userDetails;
         try {
-            userDetails = ((CustomUserDetails) customUserDetailsService.loadUserByUsername(basicLoginRequest.getEmail()));
+            userDetails = ((CustomUserDetails) customUserDetailsService.loadUserByUsername(basicLoginRequest.email()));
         } catch (UsernameNotFoundException e) {
             throw new AuthenticationException(e);
         }
 
-        if (!passwordEncoder.matches(basicLoginRequest.getPassword(), userDetails.getPassword())) {
-            throw new AuthenticationException("Invalid credentials!");
+        if (!passwordEncoder.matches(basicLoginRequest.password(), userDetails.getPassword())) {
+            throw new AuthenticationException("Invalid credentials");
         }
 
-        UserInfo userInfo = new UserInfo(userDetails.getId(), userDetails.getEmail(), userDetails.getUsername());
+        UserInfo userInfo = new UserInfo(userDetails.getId(), userDetails.getUsername(), userDetails.getUsername());
 
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(userInfo.id().toString())
-                .issuer("http://localhost:8080")
+                .subject(userInfo.email())
+                .id(userInfo.id().toString())
                 .issuedAt(now)
-                .expiresAt(now.plus(1, ChronoUnit.HOURS))
+                .expiresAt(now.plus(TOKEN_VALID_TIME, ChronoUnit.MINUTES))
                 .claim("scope", extractPermissions(userDetails))
                 .build();
 
@@ -73,18 +74,13 @@ public class AuthService {
     }
 
     @Transactional
-    public RegisterResponse registerUser(RegisterRequest registerRequest) {
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new AuthenticationException("Email is used");
+    public RegisterUserResponse registerUser(RegisterUserRequest registerUserRequest) {
+        if (userRepository.existsByEmail(registerUserRequest.email())) {
+            throw new AuthenticationException("Email is already taken");
         }
 
-        User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setUsername(registerRequest.getUsername());
+        User createdUser = userRepository.save(registerUserRequest);
 
-        User createdUser = userRepository.save(user);
-
-        return new RegisterResponse(createdUser.getId(), createdUser.getEmail(), createdUser.getUsername());
+        return new RegisterUserResponse(createdUser.id(), createdUser.email(), createdUser.username());
     }
 }

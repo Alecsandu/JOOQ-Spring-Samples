@@ -19,7 +19,7 @@ public class AccountsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        return new UserInfo(user.getId(), user.getEmail(), user.getUsername());
+        return new UserInfo(user.id(), user.email(), user.username());
     }
 
 }
