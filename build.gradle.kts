@@ -34,8 +34,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jooq")
 
     runtimeOnly("org.postgresql:postgresql")
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
 
     jooqCodegen("org.jooq:jooq-meta-extensions:$jooqVersion")
     jooqCodegen("org.postgresql:postgresql")

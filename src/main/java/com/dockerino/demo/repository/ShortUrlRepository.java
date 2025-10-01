@@ -1,6 +1,5 @@
 package com.dockerino.demo.repository;
 
-import com.dockerino.demo.exception.ShortUrlNotFoundException;
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.jooq.generated.tables.records.LinksRecord;
 import org.jooq.DSLContext;
@@ -38,13 +37,6 @@ public class ShortUrlRepository {
         );
     }
 
-    Optional<ShortUrl> findById(Long id) {
-        Record record = dsl.selectFrom(LINKS)
-                .where(LINKS.ID.eq(id))
-                .fetchOne();
-        return Optional.ofNullable(mapRecordToShortUrl(record));
-    }
-
     public Optional<ShortUrl> findByShortCode(String shortCode) {
         Record record = dsl.selectFrom(LINKS)
                 .where(LINKS.SHORT_CODE.eq(shortCode))
@@ -65,23 +57,13 @@ public class ShortUrlRepository {
     }
 
     @Transactional
-    public ShortUrl save(ShortUrl shortUrl) {
-        if (shortUrl.getId() == null) {
-            return dsl.insertInto(LINKS)
-                    .set(LINKS.SHORT_CODE, shortUrl.getShortCode())
-                    .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
-                    .set(LINKS.USER_ID, shortUrl.getUserId())
-                    .set(LINKS.CREATED_AT, OffsetDateTime.now())
-                    .returning()
-                    .fetchOne(this::mapRecordToShortUrl);
-        } else {
-            dsl.update(LINKS)
-                    .set(LINKS.SHORT_CODE, shortUrl.getShortCode())
-                    .set(LINKS.ORIGINAL_URL, shortUrl.getOriginalUrl())
-                    .set(LINKS.USER_ID, shortUrl.getUserId())
-                    .where(LINKS.ID.eq(shortUrl.getId()))
-                    .execute();
-            return findById(shortUrl.getId()).orElseThrow(ShortUrlNotFoundException::new);
-        }
+    public ShortUrl save(String shortCode, String originalUrl, UUID userId) {
+        return dsl.insertInto(LINKS)
+                .set(LINKS.SHORT_CODE, shortCode)
+                .set(LINKS.ORIGINAL_URL, originalUrl)
+                .set(LINKS.USER_ID, userId)
+                .set(LINKS.CREATED_AT, OffsetDateTime.now())
+                .returning()
+                .fetchOne(this::mapRecordToShortUrl);
     }
 }
