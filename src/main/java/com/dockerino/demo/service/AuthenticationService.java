@@ -49,20 +49,17 @@ public class AuthenticationService {
             throw new AuthenticationException("Invalid credentials");
         }
 
-        UserInfo userInfo = new UserInfo(userDetails.getId(), userDetails.getUsername(), userDetails.getUsername());
-
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(userInfo.email())
-                .id(userInfo.id().toString())
+                .subject(userDetails.email())
+                .id(userDetails.id().toString())
                 .issuedAt(now)
                 .expiresAt(now.plus(TOKEN_VALID_TIME, ChronoUnit.MINUTES))
                 .claim("scope", extractPermissions(userDetails))
                 .build();
-
         String jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
-        return new BasicLoginResponse(jwt, userInfo);
+        return new BasicLoginResponse(jwt);
     }
 
     private String extractPermissions(UserDetails userDetails) {

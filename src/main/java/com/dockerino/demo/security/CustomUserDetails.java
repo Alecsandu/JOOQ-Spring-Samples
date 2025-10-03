@@ -10,18 +10,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class CustomUserDetails implements UserDetails {
-    private final UUID id;
-    private final String email;
-    private final String password;
-    private final Collection<? extends GrantedAuthority> authorities;
-
-    private CustomUserDetails(UUID id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
+public record CustomUserDetails(
+        UUID id,
+        String email,
+        String password,
+        Collection<? extends GrantedAuthority> authorities
+) implements UserDetails {
 
     public static CustomUserDetails create(User user) {
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
@@ -31,10 +25,6 @@ public class CustomUserDetails implements UserDetails {
                 user.password(),
                 authorities
         );
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     @Override

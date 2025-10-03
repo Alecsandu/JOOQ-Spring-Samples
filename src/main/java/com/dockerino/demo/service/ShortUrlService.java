@@ -1,6 +1,7 @@
 package com.dockerino.demo.service;
 
 import com.dockerino.demo.exception.InvalidTokenException;
+import com.dockerino.demo.exception.ShortUrlNotFoundException;
 import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.demo.model.User;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -54,9 +54,10 @@ public class ShortUrlService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<String> getOriginalUrl(String shortCode) {
+    public String getOriginalUrl(String shortCode) {
         return shortUrlRepository.findByShortCode(shortCode)
-                .map(ShortUrl::originalUrl);
+                .map(ShortUrl::originalUrl)
+                .orElseThrow(ShortUrlNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
