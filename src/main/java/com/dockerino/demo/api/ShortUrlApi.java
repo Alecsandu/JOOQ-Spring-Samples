@@ -31,14 +31,13 @@ public class ShortUrlApi {
 
     @GetMapping("/{shortCode}")
     public ResponseEntity<Void> getOriginalUrlByShortCode(@PathVariable String shortCode) {
-        return shortUrlService.getOriginalUrl(shortCode)
-                .<ResponseEntity<Void>>map(originalUrl -> ResponseEntity.status(HttpStatus.FOUND)
-                        .location(URI.create(originalUrl))
-                        .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
-                        .header(HttpHeaders.PRAGMA, "no-cache")
-                        .header(HttpHeaders.EXPIRES, "0")
-                        .build())
-                .orElse(ResponseEntity.notFound().build());
+        String originalUrl = shortUrlService.getOriginalUrl(shortCode);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(originalUrl))
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .build();
     }
 
     @GetMapping("/all")
