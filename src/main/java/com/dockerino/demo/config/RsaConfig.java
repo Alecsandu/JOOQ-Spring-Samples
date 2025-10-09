@@ -1,4 +1,4 @@
-package com.dockerino.demo.security;
+package com.dockerino.demo.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
