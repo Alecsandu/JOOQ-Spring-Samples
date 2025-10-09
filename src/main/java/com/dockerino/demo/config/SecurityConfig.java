@@ -1,6 +1,5 @@
 package com.dockerino.demo.config;
 
-import com.dockerino.demo.security.RsaConfig;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -30,7 +29,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(-1, new SecureRandom());
+        return new BCryptPasswordEncoder(11, new SecureRandom());
     }
 
     @Bean
@@ -53,8 +52,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
-        return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+    JwtDecoder jwtDecoder(RSAKey rsaKey) {
+        try {
+            return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Bean

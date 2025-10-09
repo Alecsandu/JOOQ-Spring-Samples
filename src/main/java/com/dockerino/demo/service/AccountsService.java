@@ -1,6 +1,5 @@
 package com.dockerino.demo.service;
 
-import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.UserInfo;
 import com.dockerino.demo.repository.UserRepository;
@@ -16,8 +15,7 @@ public class AccountsService {
     }
 
     public UserInfo getUserInfo(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email);
 
         return new UserInfo(user.id(), user.email(), user.username());
     }

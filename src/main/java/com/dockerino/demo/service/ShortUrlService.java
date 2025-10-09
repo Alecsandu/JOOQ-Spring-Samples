@@ -1,8 +1,6 @@
 package com.dockerino.demo.service;
 
 import com.dockerino.demo.exception.InvalidTokenException;
-import com.dockerino.demo.exception.ShortUrlNotFoundException;
-import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
@@ -12,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -36,11 +33,10 @@ public class ShortUrlService {
         this.jwtDecoder = jwtDecoder;
     }
 
-    @Transactional
     public ShortUrlResponse createShortUrl(String originalUrl, HttpServletRequest request) {
         UUID userId = getUserIdFromToken(request);
 
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId);
 
         String shortCode;
         do {
@@ -53,18 +49,14 @@ public class ShortUrlService {
         return new ShortUrlResponse(shortCode, originalUrl, baseUrl + "/" + shortUrl.shortCode());
     }
 
-    @Transactional(readOnly = true)
     public String getOriginalUrl(String shortCode) {
-        return shortUrlRepository.findByShortCode(shortCode)
-                .map(ShortUrl::originalUrl)
-                .orElseThrow(ShortUrlNotFoundException::new);
+        return shortUrlRepository.findByShortCode(shortCode).originalUrl();
     }
 
-    @Transactional(readOnly = true)
     public List<ShortUrlResponse> getUserUrls(HttpServletRequest request) {
         UUID userId = getUserIdFromToken(request);
 
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId);
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 
@@ -78,7 +70,7 @@ public class ShortUrlService {
 
         Jwt jwt = jwtDecoder.decode(token);
 
-        return UUID.fromString(jwt.getClaim("jti"));
+        return UUID.fromString(jwt.getClaim("sub"));
     }
 
     private String extractTokenFromHeader(HttpServletRequest request) {

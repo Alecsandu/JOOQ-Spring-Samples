@@ -1,17 +1,16 @@
 package com.dockerino.demo.repository;
 
+import com.dockerino.demo.exception.ShortUrlNotFoundException;
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.jooq.generated.tables.records.LinksRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,7 +26,10 @@ public class ShortUrlRepository {
     }
 
     private ShortUrl mapRecordToShortUrl(Record r) {
-        if (r == null) return null;
+        if (r == null) {
+            throw new ShortUrlNotFoundException();
+        }
+
         return new ShortUrl(
                 r.get(LINKS.ID, Long.class),
                 r.get(LINKS.SHORT_CODE, String.class),
@@ -37,11 +39,12 @@ public class ShortUrlRepository {
         );
     }
 
-    public Optional<ShortUrl> findByShortCode(String shortCode) {
+    public ShortUrl findByShortCode(String shortCode) {
         Record record = dsl.selectFrom(LINKS)
                 .where(LINKS.SHORT_CODE.eq(shortCode))
                 .fetchOne();
-        return Optional.ofNullable(mapRecordToShortUrl(record));
+
+        return mapRecordToShortUrl(record);
     }
 
     public List<ShortUrl> findByUserId(UUID userId) {
@@ -56,7 +59,6 @@ public class ShortUrlRepository {
         return dsl.fetchExists(dsl.selectFrom(LINKS).where(LINKS.SHORT_CODE.eq(shortCode)));
     }
 
-    @Transactional
     public ShortUrl save(String shortCode, String originalUrl, UUID userId) {
         return dsl.insertInto(LINKS)
                 .set(LINKS.SHORT_CODE, shortCode)
