@@ -1,6 +1,6 @@
 package com.dockerino.demo.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record User(
@@ -8,7 +8,7 @@ public record User(
         String email,
         String password,
         String username,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        OffsetDateTime createdAt,
+        OffsetDateTime updatedAt
 ) {
 }

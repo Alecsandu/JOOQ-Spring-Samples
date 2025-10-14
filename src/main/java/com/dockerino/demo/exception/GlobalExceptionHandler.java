@@ -1,5 +1,6 @@
 package com.dockerino.demo.exception;
 
+import com.dockerino.demo.exception.authentication.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({AuthenticationException.class, InvalidTokenException.class})
+    @ExceptionHandler({AuthenticationException.class})
     public ResponseEntity<String> handle(AuthenticationException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }

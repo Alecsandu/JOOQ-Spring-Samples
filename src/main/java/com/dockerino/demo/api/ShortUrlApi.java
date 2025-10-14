@@ -5,7 +5,6 @@ import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.service.ShortUrlService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,17 +25,14 @@ public class ShortUrlApi {
     @PostMapping
     public ResponseEntity<ShortUrlResponse> createShortUrl(@Valid @RequestBody ShortUrlRequest shortenRequest, HttpServletRequest request) {
         ShortUrlResponse response = shortUrlService.createShortUrl(shortenRequest.originalUrl(), request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.created(URI.create(response.fullShortUrl())).body(response);
     }
 
     @GetMapping("/{shortCode}")
     public ResponseEntity<Void> getOriginalUrlByShortCode(@PathVariable String shortCode) {
         String originalUrl = shortUrlService.getOriginalUrl(shortCode);
-        return ResponseEntity.status(HttpStatus.FOUND)
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .location(URI.create(originalUrl))
-                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
-                .header(HttpHeaders.PRAGMA, "no-cache")
-                .header(HttpHeaders.EXPIRES, "0")
                 .build();
     }
 

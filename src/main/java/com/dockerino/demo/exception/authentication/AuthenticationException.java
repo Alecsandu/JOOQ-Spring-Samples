@@ -1,4 +1,4 @@
-package com.dockerino.demo.exception;
+package com.dockerino.demo.exception.authentication;
 
 /**
  * Thrown by classes which handle authentication of the user.
@@ -11,5 +11,9 @@ public class AuthenticationException extends RuntimeException{
 
     public AuthenticationException(Throwable cause) {
         super(cause);
+    }
+
+    public AuthenticationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
