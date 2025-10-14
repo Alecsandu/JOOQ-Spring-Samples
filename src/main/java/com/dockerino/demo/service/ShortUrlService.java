@@ -1,8 +1,8 @@
 package com.dockerino.demo.service;
 
-import com.dockerino.demo.exception.InvalidTokenException;
+import com.dockerino.demo.exception.UserNotFoundException;
+import com.dockerino.demo.exception.authentication.InvalidTokenException;
 import com.dockerino.demo.model.ShortUrl;
-import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.repository.ShortUrlRepository;
 import com.dockerino.demo.repository.UserRepository;
@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -33,20 +34,23 @@ public class ShortUrlService {
         this.jwtDecoder = jwtDecoder;
     }
 
+    @Transactional
     public ShortUrlResponse createShortUrl(String originalUrl, HttpServletRequest request) {
         UUID userId = getUserIdFromToken(request);
 
-        User user = userRepository.findById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException();
+        }
 
         String shortCode;
         do {
             shortCode = generateShortCode();
         } while (shortUrlRepository.existsByShortCode(shortCode));
 
-        ShortUrl shortUrl = shortUrlRepository.save(shortCode, originalUrl, user.id());
+        ShortUrl shortUrl = shortUrlRepository.save(shortCode, originalUrl, userId);
 
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-        return new ShortUrlResponse(shortCode, originalUrl, baseUrl + "/" + shortUrl.shortCode());
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/" + shortUrl.shortCode();
+        return new ShortUrlResponse(shortCode, originalUrl, baseUrl);
     }
 
     public String getOriginalUrl(String shortCode) {
@@ -56,11 +60,14 @@ public class ShortUrlService {
     public List<ShortUrlResponse> getUserUrls(HttpServletRequest request) {
         UUID userId = getUserIdFromToken(request);
 
-        User user = userRepository.findById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException();
+        }
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 
-        return shortUrlRepository.findByUserId(user.id()).stream()
+        return shortUrlRepository.findByUserId(userId)
+                .stream()
                 .map(su -> new ShortUrlResponse(su.shortCode(), su.originalUrl(), baseUrl + "/" + su.shortCode()))
                 .collect(Collectors.toList());
     }

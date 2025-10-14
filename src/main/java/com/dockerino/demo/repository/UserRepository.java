@@ -1,16 +1,18 @@
 package com.dockerino.demo.repository;
 
 import com.dockerino.demo.exception.UserNotFoundException;
+import com.dockerino.demo.exception.authentication.AuthenticationException;
+import com.dockerino.demo.exception.authentication.UserAlreadyExistsException;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.RegisterUserRequest;
 import com.dockerino.jooq.generated.tables.records.UsersRecord;
 import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.Select;
+import org.jooq.TableField;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.dockerino.jooq.generated.tables.Users.USERS;
@@ -26,50 +28,65 @@ public class UserRepository {
         this.passwordEncoder = passwordEncoder;
     }
 
-    private User mapRecordToUser(Record r) {
-        if (r == null) {
-            throw new UserNotFoundException();
-        }
-
-        return new User(
-                r.get(USERS.ID, UUID.class),
-                r.get(USERS.EMAIL, String.class),
-                r.get(USERS.PASSWORD, String.class),
-                r.get(USERS.USERNAME, String.class),
-                r.get(USERS.CREATED_AT, LocalDateTime.class),
-                r.get(USERS.UPDATED_AT, LocalDateTime.class)
-        );
-    }
-
-    public User findById(UUID id) {
-        Record record = dsl.selectFrom(USERS)
-                .where(USERS.ID.eq(id))
-                .fetchOne();
-
-        return mapRecordToUser(record);
-    }
-
     public User findByEmail(String email) {
-        Record record = dsl.selectFrom(USERS)
+        UsersRecord record = dsl.selectFrom(USERS)
                 .where(USERS.EMAIL.eq(email))
                 .fetchOne();
 
         return mapRecordToUser(record);
     }
 
+    public Boolean existsById(UUID id) {
+        return existsByGivenField(USERS.ID, id);
+    }
+
     public Boolean existsByEmail(String email) {
+        return existsByGivenField(USERS.EMAIL, email);
+    }
+
+    public Boolean existsByUsername(String username) {
+        return existsByGivenField(USERS.USERNAME, username);
+    }
+
+    private <T> Boolean existsByGivenField(TableField<UsersRecord, T> tableField, T expectedValue) {
         Select<UsersRecord> usersSelect = dsl.selectFrom(USERS)
-                .where(USERS.EMAIL.eq(email));
+                .where(tableField.eq(expectedValue));
 
         return dsl.fetchExists(usersSelect);
     }
 
-    public User save(RegisterUserRequest registerUserRequest) {
-        return dsl.insertInto(USERS)
-                .set(USERS.EMAIL, registerUserRequest.email())
-                .set(USERS.USERNAME, registerUserRequest.username())
-                .set(USERS.PASSWORD, passwordEncoder.encode(registerUserRequest.password()))
-                .returning()
-                .fetchOne(this::mapRecordToUser);
+    public Object[] save(RegisterUserRequest registerUserRequest) {
+        try {
+            UsersRecord record = dsl.insertInto(USERS, USERS.EMAIL, USERS.USERNAME, USERS.PASSWORD)
+                    .values(
+                            registerUserRequest.email(),
+                            registerUserRequest.username(),
+                            passwordEncoder.encode(registerUserRequest.password())
+                    )
+                    .returning(USERS.ID, USERS.EMAIL, USERS.USERNAME)
+                    .fetchOne();
+
+            if (record == null) {
+                throw new AuthenticationException("Failed to create account");
+            }
+
+            return new Object[]{record.getId(), record.getEmail(), record.getUsername()};
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new UserAlreadyExistsException("The email or username is already taken", ex);
+        }
+    }
+
+    private User mapRecordToUser(UsersRecord r) {
+        if (r == null) {
+            throw new UserNotFoundException();
+        }
+
+        return new User(r.getId(),
+                r.getEmail(),
+                r.getPassword(),
+                r.getUsername(),
+                r.getCreatedAt(),
+                r.getUpdatedAt());
     }
 }

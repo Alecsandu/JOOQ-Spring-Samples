@@ -4,11 +4,9 @@ import com.dockerino.demo.exception.ShortUrlNotFoundException;
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.jooq.generated.tables.records.LinksRecord;
 import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.Result;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,22 +23,8 @@ public class ShortUrlRepository {
         this.dsl = dsl;
     }
 
-    private ShortUrl mapRecordToShortUrl(Record r) {
-        if (r == null) {
-            throw new ShortUrlNotFoundException();
-        }
-
-        return new ShortUrl(
-                r.get(LINKS.ID, Long.class),
-                r.get(LINKS.SHORT_CODE, String.class),
-                r.get(LINKS.ORIGINAL_URL, String.class),
-                r.get(LINKS.USER_ID, UUID.class),
-                r.get(LINKS.CREATED_AT, LocalDateTime.class)
-        );
-    }
-
     public ShortUrl findByShortCode(String shortCode) {
-        Record record = dsl.selectFrom(LINKS)
+        LinksRecord record = dsl.selectFrom(LINKS)
                 .where(LINKS.SHORT_CODE.eq(shortCode))
                 .fetchOne();
 
@@ -56,7 +40,10 @@ public class ShortUrlRepository {
     }
 
     public boolean existsByShortCode(String shortCode) {
-        return dsl.fetchExists(dsl.selectFrom(LINKS).where(LINKS.SHORT_CODE.eq(shortCode)));
+        return dsl.fetchExists(
+                dsl.selectFrom(LINKS)
+                        .where(LINKS.SHORT_CODE.eq(shortCode))
+        );
     }
 
     public ShortUrl save(String shortCode, String originalUrl, UUID userId) {
@@ -67,5 +54,17 @@ public class ShortUrlRepository {
                 .set(LINKS.CREATED_AT, OffsetDateTime.now())
                 .returning()
                 .fetchOne(this::mapRecordToShortUrl);
+    }
+
+    private ShortUrl mapRecordToShortUrl(LinksRecord r) {
+        if (r == null) {
+            throw new ShortUrlNotFoundException();
+        }
+
+        return new ShortUrl(r.getId(),
+                r.getShortCode(),
+                r.getOriginalUrl(),
+                r.getUserId(),
+                r.getCreatedAt());
     }
 }

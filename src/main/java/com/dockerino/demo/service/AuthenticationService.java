@@ -1,6 +1,7 @@
 package com.dockerino.demo.service;
 
-import com.dockerino.demo.exception.AuthenticationException;
+import com.dockerino.demo.exception.authentication.AuthenticationException;
+import com.dockerino.demo.exception.authentication.UserAlreadyExistsException;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.BasicLoginRequest;
 import com.dockerino.demo.model.dtos.BasicLoginResponse;
@@ -12,9 +13,11 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 @Service
 public class AuthenticationService {
@@ -40,14 +43,21 @@ public class AuthenticationService {
         return new BasicLoginResponse(generateToken(user));
     }
 
+    @Transactional
     public RegisterUserResponse registerUser(RegisterUserRequest registerUserRequest) {
         if (userRepository.existsByEmail(registerUserRequest.email())) {
-            throw new AuthenticationException("Email is already taken");
+            throw new UserAlreadyExistsException("Account with given email already exists");
         }
 
-        User createdUser = userRepository.save(registerUserRequest);
+        if (userRepository.existsByUsername(registerUserRequest.username())) {
+            throw new UserAlreadyExistsException("Account with given username already exists");
+        }
 
-        return new RegisterUserResponse(createdUser.id(), createdUser.email(), createdUser.username());
+        Object[] createdUserDetails = userRepository.save(registerUserRequest);
+
+        return new RegisterUserResponse((UUID) createdUserDetails[0],
+                (String) createdUserDetails[1],
+                (String) createdUserDetails[2]);
     }
 
     private String generateToken(User user) {
