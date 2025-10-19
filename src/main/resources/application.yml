@@ -7,6 +7,12 @@ spring:
     url: jdbc:postgresql://localhost:5432/jooq-demo
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
+  data:
+    redis:
+      host: localhost
+      port: 17213
+      username: redis
+      password: redis
 app:
   jwt:
     public-key: ${PUBLIC_KEY}

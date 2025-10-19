@@ -5,6 +5,8 @@ import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.jooq.generated.tables.records.LinksRecord;
 import org.jooq.DSLContext;
 import org.jooq.Result;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static com.dockerino.jooq.generated.tables.Links.LINKS;
 
+@CacheConfig("links")
 @Repository
 public class ShortUrlRepository {
 
@@ -23,7 +26,9 @@ public class ShortUrlRepository {
         this.dsl = dsl;
     }
 
+    @Cacheable(value = "database-SHORT", key = "#shortCode")
     public ShortUrl findByShortCode(String shortCode) {
+        System.out.println("Fetch data from db!");
         LinksRecord record = dsl.selectFrom(LINKS)
                 .where(LINKS.SHORT_CODE.eq(shortCode))
                 .fetchOne();
