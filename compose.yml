@@ -29,6 +29,25 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin/
 
+  redis-cache:
+    image: redis:8.2.2-alpine3.22
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: [
+      "redis-server",
+      "--requirepass", "redis",
+      "--aclfile", "/usr/local/etc/redis/users.acl"
+    ]
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - redis_data:/data
+      - ./config/docker/redis/users.acl:/usr/local/etc/redis/users.acl
+
   jooq-service:
     image: localhost/java-jooq-spring:0.0.1
     depends_on:
@@ -49,4 +68,5 @@ networks:
 volumes:
   postgres_data: {}
   pgadmin_data: {}
+  redis_data: {}
 

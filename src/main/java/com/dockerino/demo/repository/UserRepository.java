@@ -48,13 +48,6 @@ public class UserRepository {
         return existsByGivenField(USERS.USERNAME, username);
     }
 
-    private <T> Boolean existsByGivenField(TableField<UsersRecord, T> tableField, T expectedValue) {
-        Select<UsersRecord> usersSelect = dsl.selectFrom(USERS)
-                .where(tableField.eq(expectedValue));
-
-        return dsl.fetchExists(usersSelect);
-    }
-
     public Object[] save(RegisterUserRequest registerUserRequest) {
         try {
             UsersRecord record = dsl.insertInto(USERS, USERS.EMAIL, USERS.USERNAME, USERS.PASSWORD)
@@ -75,6 +68,13 @@ public class UserRepository {
         } catch (DataIntegrityViolationException ex) {
             throw new UserAlreadyExistsException("The email or username is already taken", ex);
         }
+    }
+
+    private <T> Boolean existsByGivenField(TableField<UsersRecord, T> tableField, T expectedValue) {
+        Select<UsersRecord> usersSelect = dsl.selectFrom(USERS)
+                .where(tableField.eq(expectedValue));
+
+        return dsl.fetchExists(usersSelect);
     }
 
     private User mapRecordToUser(UsersRecord r) {
