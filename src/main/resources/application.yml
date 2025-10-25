@@ -10,7 +10,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 17213
+      port: 6379
       username: redis
       password: redis
 app:

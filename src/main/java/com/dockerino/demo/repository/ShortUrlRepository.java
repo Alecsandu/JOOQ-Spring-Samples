@@ -28,7 +28,6 @@ public class ShortUrlRepository {
 
     @Cacheable(value = "database-SHORT", key = "#shortCode")
     public ShortUrl findByShortCode(String shortCode) {
-        System.out.println("Fetch data from db!");
         LinksRecord record = dsl.selectFrom(LINKS)
                 .where(LINKS.SHORT_CODE.eq(shortCode))
                 .fetchOne();
