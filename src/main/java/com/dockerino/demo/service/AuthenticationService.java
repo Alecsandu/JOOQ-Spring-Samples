@@ -53,11 +53,7 @@ public class AuthenticationService {
             throw new UserAlreadyExistsException("Account with given username already exists");
         }
 
-        Object[] createdUserDetails = userRepository.save(registerUserRequest);
-
-        return new RegisterUserResponse((UUID) createdUserDetails[0],
-                (String) createdUserDetails[1],
-                (String) createdUserDetails[2]);
+        return userRepository.save(registerUserRequest);
     }
 
     private String generateToken(User user) {
