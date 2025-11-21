@@ -3,6 +3,7 @@ package com.dockerino.demo.api;
 import com.dockerino.demo.model.dtos.UserInfo;
 import com.dockerino.demo.service.AccountsService;
 import jakarta.validation.constraints.Email;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ public class AccountsApi {
     }
 
     @GetMapping("/userinfo")
-    public ResponseEntity<UserInfo> getUserInfo(@RequestParam @Email String email) {
+    public ResponseEntity<@NonNull UserInfo> getUserInfo(@RequestParam @Email String email) {
         UserInfo userInfo = accountsService.getUserInfo(email);
         return ResponseEntity.ok(userInfo);
     }

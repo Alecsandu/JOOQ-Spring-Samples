@@ -3,6 +3,7 @@ package com.dockerino.demo.api;
 import com.dockerino.demo.model.dtos.*;
 import com.dockerino.demo.service.AuthenticationService;
 import jakarta.validation.Valid;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +18,13 @@ public class AuthenticationApi {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<BasicLoginResponse> login(@Valid @RequestBody BasicLoginRequest basicLoginRequest) {
+    public ResponseEntity<@NonNull BasicLoginResponse> login(@Valid @RequestBody BasicLoginRequest basicLoginRequest) {
         BasicLoginResponse basicLoginResponse = authenticationService.loginUser(basicLoginRequest);
         return ResponseEntity.ok(basicLoginResponse);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest registerUserRequest) {
+    public ResponseEntity<@NonNull RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest registerUserRequest) {
         RegisterUserResponse registerUserResponse = authenticationService.registerUser(registerUserRequest);
         return ResponseEntity.ok(registerUserResponse);
     }
