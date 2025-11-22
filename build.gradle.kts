@@ -1,8 +1,8 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.5.7"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.jooq.jooq-codegen-gradle") version "3.19.27"
+    id("org.jooq.jooq-codegen-gradle") version "3.19.28"
 }
 
 group = "com.dockerino"
@@ -24,24 +24,26 @@ repositories {
     mavenCentral()
 }
 
-val jooqVersion = "3.19.27"
+val jooqVersion = "3.19.28"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
+
+    implementation("com.nimbusds:nimbus-jose-jwt")
 
     runtimeOnly("org.postgresql:postgresql")
 
     jooqCodegen("org.jooq:jooq-meta-extensions:$jooqVersion")
     jooqCodegen("org.postgresql:postgresql")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
