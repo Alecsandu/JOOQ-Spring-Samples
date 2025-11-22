@@ -35,6 +35,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
 
+    implementation("com.nimbusds:nimbus-jose-jwt")
+
     runtimeOnly("org.postgresql:postgresql")
 
     jooqCodegen("org.jooq:jooq-meta-extensions:$jooqVersion")
