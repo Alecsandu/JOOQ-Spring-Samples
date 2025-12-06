@@ -33,7 +33,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .cors(AbstractHttpConfigurer::disable)//TODO: add cors before ever using it in prod
                 .csrf(AbstractHttpConfigurer::disable)

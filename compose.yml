@@ -47,6 +47,21 @@ services:
     volumes:
       - redis_data:/data
       - ./config/docker/redis/users.acl:/usr/local/etc/redis/users.acl
+    networks:
+      - demo-net
+
+  redis-insights:
+    image: redis/redisinsight:2.70.1
+    container_name: redis-insights
+    ports:
+      - "5540:5540"
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+    volumes:
+      - redis_insights_data:/data
+    networks:
+      - demo-net
 
   jooq-service:
     image: localhost/java-jooq-spring:0.0.1
@@ -69,4 +84,5 @@ volumes:
   postgres_data: {}
   pgadmin_data: {}
   redis_data: {}
+  redis_insights_data: {}
 
