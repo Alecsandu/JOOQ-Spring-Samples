@@ -17,6 +17,10 @@ CREATE TABLE IF NOT EXISTS links (
 
 -- Constraints
 
+--CREATE UNIQUE INDEX idx_users_id ON users (id);
+--CREATE UNIQUE INDEX idx_links_id ON links (id);
+--CREATE UNIQUE INDEX idx_links_short_code ON links (short_code);
+
 ALTER TABLE links
 ADD CONSTRAINT fk_user
     FOREIGN KEY (user_id)

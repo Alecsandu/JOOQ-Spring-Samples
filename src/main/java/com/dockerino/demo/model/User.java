@@ -1,5 +1,7 @@
 package com.dockerino.demo.model;
 
+import org.jspecify.annotations.NonNull;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -11,4 +13,16 @@ public record User(
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
 ) {
+    @Override
+    @NonNull
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + "****" + '\'' +
+                ", username='" + username + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }
