@@ -16,7 +16,7 @@ Basic authentication with authorization done via JWTs without server-side sessio
 
 ### Podman
 ```shell
-podman build --network jooq-spring-samples_demo-net -t java-jooq-spring:0.0.1 -f Containerfile
+podman build --network jooq-spring-samples_demo-net -t java-jooq-spring:1.0.0 -f Containerfile
 ```
 
 ### or Docker
