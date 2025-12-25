@@ -1,8 +1,8 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.0"
+    id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.jooq.jooq-codegen-gradle") version "3.19.28"
+    id("org.jooq.jooq-codegen-gradle") version "3.19.29"
 }
 
 group = "com.dockerino"
@@ -24,7 +24,7 @@ repositories {
     mavenCentral()
 }
 
-val jooqVersion = "3.19.28"
+val jooqVersion = "3.19.29"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
