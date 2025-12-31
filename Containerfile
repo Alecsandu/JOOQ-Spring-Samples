@@ -1,5 +1,5 @@
 # -------------------- Build the initial jar file -------------------- #
-FROM gradle:9.2.1-jdk21-alpine AS builder
+FROM gradle:9.2.1-jdk25-alpine AS builder
 
 ## Copy gradle build configs & settings ##
 WORKDIR /opt/app
@@ -20,7 +20,7 @@ RUN jlink --add-modules $(cat deps.info) --strip-debug --compress 2 --no-header-
 
 
 # -------------------- Extract layers -------------------- #
-FROM eclipse-temurin:21-jre-alpine-3.23 AS extractor
+FROM eclipse-temurin:25-jre-alpine-3.23 AS extractor
 
 WORKDIR /opt/app
 COPY --from=builder /opt/app/build/libs/*.jar application.jar

@@ -8,8 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS links (
-    id BIGSERIAL PRIMARY KEY,
-    short_code VARCHAR(15) UNIQUE NOT NULL,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     original_url TEXT NOT NULL,
     user_id UUID NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -27,20 +26,3 @@ ADD CONSTRAINT fk_user
     REFERENCES users(id)
     ON DELETE CASCADE
     ON UPDATE CASCADE;
-
---- Functions
-
-CREATE OR REPLACE FUNCTION trigger_set_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
---- Triggers
-
-CREATE TRIGGER set_timestamp_users
-BEFORE UPDATE ON users
-FOR EACH ROW
-EXECUTE FUNCTION trigger_set_timestamp();

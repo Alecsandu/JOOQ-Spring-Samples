@@ -27,9 +27,9 @@ public class ShortUrlRepository {
     }
 
     @Cacheable(value = "database-SHORT", key = "#shortCode")
-    public ShortUrl findByShortCode(String shortCode) {
+    public ShortUrl findByShortCode(Long shortCode) {
         LinksRecord record = dsl.selectFrom(LINKS)
-                .where(LINKS.SHORT_CODE.eq(shortCode))
+                .where(LINKS.ID.eq(shortCode))
                 .fetchOne();
 
         return mapRecordToShortUrl(record);
@@ -40,19 +40,13 @@ public class ShortUrlRepository {
                 .where(LINKS.USER_ID.eq(userId))
                 .orderBy(LINKS.CREATED_AT.desc())
                 .fetch();
-        return records.stream().map(this::mapRecordToShortUrl).collect(Collectors.toList());
+        return records.stream()
+                .map(this::mapRecordToShortUrl)
+                .collect(Collectors.toList());
     }
 
-    public boolean existsByShortCode(String shortCode) {
-        return dsl.fetchExists(
-                dsl.selectFrom(LINKS)
-                        .where(LINKS.SHORT_CODE.eq(shortCode))
-        );
-    }
-
-    public ShortUrl save(String shortCode, String originalUrl, UUID userId) {
+    public ShortUrl save(String originalUrl, UUID userId) {
         return dsl.insertInto(LINKS)
-                .set(LINKS.SHORT_CODE, shortCode)
                 .set(LINKS.ORIGINAL_URL, originalUrl)
                 .set(LINKS.USER_ID, userId)
                 .set(LINKS.CREATED_AT, OffsetDateTime.now())
@@ -66,7 +60,6 @@ public class ShortUrlRepository {
         }
 
         return new ShortUrl(r.getId(),
-                r.getShortCode(),
                 r.getOriginalUrl(),
                 r.getUserId(),
                 r.getCreatedAt());

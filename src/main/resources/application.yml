@@ -21,3 +21,5 @@ app:
     public-key: ${PUBLIC_KEY}
     private-key: ${PRIVATE_KEY}
     expiration-ms: 300000
+domain:
+  url: "http://localhost:8080/"
