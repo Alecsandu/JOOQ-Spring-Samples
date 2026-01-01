@@ -15,8 +15,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 
-@Configuration
 @EnableCaching
+@Configuration
 public class CacheConfiguration {
 
     @Bean

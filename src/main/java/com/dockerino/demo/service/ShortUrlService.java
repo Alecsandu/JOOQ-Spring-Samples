@@ -1,19 +1,19 @@
 package com.dockerino.demo.service;
 
+import com.dockerino.demo.config.properties.DomainProperties;
 import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.exception.authentication.InvalidTokenException;
 import com.dockerino.demo.model.ShortUrl;
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.repository.ShortUrlRepository;
 import com.dockerino.demo.repository.UserRepository;
+import in.co.tasky.Base32;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,17 +21,22 @@ import java.util.stream.Collectors;
 @Service
 public class ShortUrlService {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
-    private static final int SHORT_CODE_LENGTH = 8;
-
     private final ShortUrlRepository shortUrlRepository;
+
     private final UserRepository userRepository;
+
     private final JwtDecoder jwtDecoder;
 
-    public ShortUrlService(ShortUrlRepository shortUrlRepository, UserRepository userRepository, JwtDecoder jwtDecoder) {
+    private final DomainProperties domainProperties;
+
+    public ShortUrlService(
+            ShortUrlRepository shortUrlRepository, UserRepository userRepository,
+            JwtDecoder jwtDecoder, DomainProperties domainProperties
+    ) {
         this.shortUrlRepository = shortUrlRepository;
         this.userRepository = userRepository;
         this.jwtDecoder = jwtDecoder;
+        this.domainProperties = domainProperties;
     }
 
     @Transactional
@@ -42,19 +47,21 @@ public class ShortUrlService {
             throw new UserNotFoundException();
         }
 
-        String shortCode;
-        do {
-            shortCode = generateShortCode();
-        } while (shortUrlRepository.existsByShortCode(shortCode));
+        ShortUrl shortUrl = shortUrlRepository.save(originalUrl, userId);
 
-        ShortUrl shortUrl = shortUrlRepository.save(shortCode, originalUrl, userId);
+        String shortcode = Base32.encode(shortUrl.id().toString(), false);
 
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/" + shortUrl.shortCode();
-        return new ShortUrlResponse(shortCode, originalUrl, baseUrl);
+        String baseUrl = domainProperties.url() + shortcode;
+        return new ShortUrlResponse(originalUrl, baseUrl);
     }
 
     public String getOriginalUrl(String shortCode) {
-        return shortUrlRepository.findByShortCode(shortCode).originalUrl();
+        try {
+            Long code = Long.valueOf(Base32.decode(shortCode, false));
+            return shortUrlRepository.findByShortCode(code).originalUrl();
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("Invalid url");
+        }
     }
 
     public List<ShortUrlResponse> getUserUrls(HttpServletRequest request) {
@@ -64,11 +71,11 @@ public class ShortUrlService {
             throw new UserNotFoundException();
         }
 
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-
-        return shortUrlRepository.findByUserId(userId)
-                .stream()
-                .map(su -> new ShortUrlResponse(su.shortCode(), su.originalUrl(), baseUrl + "/" + su.shortCode()))
+        return shortUrlRepository.findAllByUserId(userId)
+                .map(su -> {
+                    String shortcode = Base32.encode(su.id().toString(), false);
+                    return new ShortUrlResponse(su.originalUrl(), domainProperties.url() + shortcode);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -88,12 +95,5 @@ public class ShortUrlService {
         }
 
         return bearerToken.substring(7);
-    }
-
-    private String generateShortCode() {
-        byte[] bytes = new byte[SHORT_CODE_LENGTH];
-        RANDOM.nextBytes(bytes);
-        String base64Encoded = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-        return base64Encoded.substring(0, Math.min(base64Encoded.length(), SHORT_CODE_LENGTH));
     }
 }

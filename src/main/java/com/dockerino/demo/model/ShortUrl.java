@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public record ShortUrl(
         Long id,
-        String shortCode,
         String originalUrl,
         UUID userId,
         OffsetDateTime createdAt

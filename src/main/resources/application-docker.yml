@@ -2,6 +2,9 @@ server:
   port: 8080
   shutdown: GRACEFUL
 spring:
+  threads:
+    virtual:
+      enabled: true
   application:
     name: "Demo APP with jOOQ"
   datasource:
@@ -20,4 +23,5 @@ app:
   jwt:
     public-key: ${PUBLIC_KEY}
     private-key: ${PRIVATE_KEY}
-    expiration-ms: 300000
+domain:
+  url: "http://localhost:8080/"

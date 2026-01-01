@@ -30,7 +30,7 @@ public class ShortUrlApi {
     }
 
     @GetMapping("/{shortCode}")
-    public ResponseEntity<@NonNull Void> getOriginalUrlByShortCode(@PathVariable String shortCode) {
+    public ResponseEntity<@NonNull Void> getUrlByShortCode(@PathVariable String shortCode) {
         String originalUrl = shortUrlService.getOriginalUrl(shortCode);
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .location(URI.create(originalUrl))

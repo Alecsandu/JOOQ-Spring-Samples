@@ -1,7 +1,6 @@
-package com.dockerino.demo.config;
+package com.dockerino.demo.config.properties;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -10,19 +9,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-@Component
-public class RsaConfig {
-
-    private final String privateKey;
-    private final String publicKey;
-
-    public RsaConfig(
-            @Value("${app.jwt.private-key}") String privateKey,
-            @Value("${app.jwt.public-key}") String publicKey
-    ) {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
-    }
+@ConfigurationProperties(prefix = "app.jwt")
+public record JwtProperties(String publicKey, String privateKey) {
 
     public RSAPublicKey getPublicKey() {
         try {
@@ -43,4 +31,5 @@ public class RsaConfig {
             throw new IllegalArgumentException("Invalid private key", e);
         }
     }
+
 }

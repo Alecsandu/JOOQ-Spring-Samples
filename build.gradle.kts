@@ -10,7 +10,7 @@ version = "1.0.0"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -25,6 +25,7 @@ repositories {
 }
 
 val jooqVersion = "3.19.29"
+val javaBase32Version = "1.0.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
@@ -34,6 +35,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
+    implementation("in.co.tasky:java-base32:$javaBase32Version")
 
     implementation("com.nimbusds:nimbus-jose-jwt")
 

@@ -17,8 +17,6 @@ public class AccountsService {
     public UserInfo getUserInfo(String email) {
         User user = userRepository.findByEmail(email);
 
-        //TODO: setup permissions so that other users can't directly see info about other users, create other endpoint for public info
-
         return new UserInfo(user.id(), user.email(), user.username());
     }
 

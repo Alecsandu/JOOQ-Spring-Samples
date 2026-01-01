@@ -1,5 +1,6 @@
 package com.dockerino.demo.service;
 
+import com.dockerino.demo.config.properties.DomainProperties;
 import com.dockerino.demo.exception.authentication.AuthenticationException;
 import com.dockerino.demo.exception.authentication.UserAlreadyExistsException;
 import com.dockerino.demo.model.User;
@@ -22,14 +23,23 @@ import java.time.temporal.ChronoUnit;
 public class AuthenticationService {
 
     private static final Long TOKEN_VALID_TIME = 5L;
+
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+
     private final JwtEncoder jwtEncoder;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder) {
+    private final DomainProperties domainProperties;
+
+    public AuthenticationService(
+            UserRepository userRepository, PasswordEncoder passwordEncoder,
+            JwtEncoder jwtEncoder, DomainProperties domainProperties
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtEncoder = jwtEncoder;
+        this.domainProperties = domainProperties;
     }
 
     public BasicLoginResponse loginUser(BasicLoginRequest basicLoginRequest) {
@@ -61,8 +71,7 @@ public class AuthenticationService {
                 .subject(user.id().toString())
                 .issuedAt(now)
                 .expiresAt(now.plus(TOKEN_VALID_TIME, ChronoUnit.MINUTES))
-                .claim("scope", "ROLE_USER")
-                .issuer("http://localhost:8080")
+                .issuer(domainProperties.root())
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
