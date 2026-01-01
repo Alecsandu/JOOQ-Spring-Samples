@@ -1,6 +1,6 @@
 package com.dockerino.demo.service;
 
-import com.dockerino.demo.config.UrlProperties;
+import com.dockerino.demo.config.properties.DomainProperties;
 import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.exception.authentication.InvalidTokenException;
 import com.dockerino.demo.model.ShortUrl;
@@ -22,17 +22,21 @@ import java.util.stream.Collectors;
 public class ShortUrlService {
 
     private final ShortUrlRepository shortUrlRepository;
-    private final UserRepository userRepository;
-    private final JwtDecoder jwtDecoder;
-    private final UrlProperties urlProperties;
 
-    public ShortUrlService(ShortUrlRepository shortUrlRepository, UserRepository userRepository,
-                           JwtDecoder jwtDecoder, UrlProperties urlProperties
+    private final UserRepository userRepository;
+
+    private final JwtDecoder jwtDecoder;
+
+    private final DomainProperties domainProperties;
+
+    public ShortUrlService(
+            ShortUrlRepository shortUrlRepository, UserRepository userRepository,
+            JwtDecoder jwtDecoder, DomainProperties domainProperties
     ) {
         this.shortUrlRepository = shortUrlRepository;
         this.userRepository = userRepository;
         this.jwtDecoder = jwtDecoder;
-        this.urlProperties = urlProperties;
+        this.domainProperties = domainProperties;
     }
 
     @Transactional
@@ -44,9 +48,10 @@ public class ShortUrlService {
         }
 
         ShortUrl shortUrl = shortUrlRepository.save(originalUrl, userId);
+
         String shortcode = Base32.encode(shortUrl.id().toString(), false);
 
-        String baseUrl = urlProperties.getUrl() + shortcode;
+        String baseUrl = domainProperties.url() + shortcode;
         return new ShortUrlResponse(originalUrl, baseUrl);
     }
 
@@ -66,11 +71,10 @@ public class ShortUrlService {
             throw new UserNotFoundException();
         }
 
-        return shortUrlRepository.findByUserId(userId)
-                .stream()
+        return shortUrlRepository.findAllByUserId(userId)
                 .map(su -> {
                     String shortcode = Base32.encode(su.id().toString(), false);
-                    return new ShortUrlResponse(su.originalUrl(), urlProperties.getUrl() + shortcode);
+                    return new ShortUrlResponse(su.originalUrl(), domainProperties.url() + shortcode);
                 })
                 .collect(Collectors.toList());
     }

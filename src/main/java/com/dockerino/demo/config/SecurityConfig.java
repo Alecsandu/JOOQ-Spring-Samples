@@ -1,5 +1,6 @@
 package com.dockerino.demo.config;
 
+import com.dockerino.demo.config.properties.JwtProperties;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -66,10 +67,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    RSAKey rsaKey(RsaConfig rsaConfig) {
+    RSAKey rsaKey(JwtProperties jwtProperties) {
         return new RSAKey
-                .Builder(rsaConfig.getPublicKey())
-                .privateKey(rsaConfig.getPrivateKey())
+                .Builder(jwtProperties.getPublicKey())
+                .privateKey(jwtProperties.getPrivateKey())
                 .build();
     }
 }

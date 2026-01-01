@@ -10,9 +10,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.dockerino.jooq.generated.tables.Links.LINKS;
 
@@ -35,14 +34,13 @@ public class ShortUrlRepository {
         return mapRecordToShortUrl(record);
     }
 
-    public List<ShortUrl> findByUserId(UUID userId) {
+    public Stream<ShortUrl> findAllByUserId(UUID userId) {
         Result<LinksRecord> records = dsl.selectFrom(LINKS)
                 .where(LINKS.USER_ID.eq(userId))
                 .orderBy(LINKS.CREATED_AT.desc())
                 .fetch();
         return records.stream()
-                .map(this::mapRecordToShortUrl)
-                .collect(Collectors.toList());
+                .map(this::mapRecordToShortUrl);
     }
 
     public ShortUrl save(String originalUrl, UUID userId) {
