@@ -2,7 +2,9 @@ package com.dockerino.demo.config;
 
 import com.dockerino.demo.config.properties.JwtProperties;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +45,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**")
+                        .requestMatchers("/api/auth/**", "/api/well-known/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
@@ -71,6 +73,8 @@ public class SecurityConfig {
         return new RSAKey
                 .Builder(jwtProperties.getPublicKey())
                 .privateKey(jwtProperties.getPrivateKey())
+                .keyUse(KeyUse.SIGNATURE)
+                .algorithm(JWSAlgorithm.RS256)
                 .build();
     }
 }
