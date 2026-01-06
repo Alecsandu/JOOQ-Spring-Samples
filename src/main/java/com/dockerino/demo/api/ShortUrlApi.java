@@ -26,7 +26,7 @@ public class ShortUrlApi {
     @PostMapping
     public ResponseEntity<@NonNull ShortUrlResponse> createShortUrl(@Valid @RequestBody ShortUrlRequest shortenRequest, HttpServletRequest request) {
         ShortUrlResponse response = shortUrlService.createShortUrl(shortenRequest.originalUrl(), request);
-        return ResponseEntity.created(URI.create(response.fullShortUrl())).body(response);
+        return ResponseEntity.created(URI.create(response.shortcode())).body(response);
     }
 
     @GetMapping("/{shortCode}")

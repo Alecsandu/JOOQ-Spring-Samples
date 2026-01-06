@@ -10,7 +10,10 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 @ConfigurationProperties(prefix = "app.jwt")
-public record JwtProperties(String publicKey, String privateKey) {
+public record JwtProperties(
+        String publicKey,
+        String privateKey
+) {
 
     public RSAPublicKey getPublicKey() {
         try {

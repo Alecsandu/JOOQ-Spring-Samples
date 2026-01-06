@@ -6,16 +6,16 @@ spring:
     virtual:
       enabled: true
   application:
-    name: "Demo APP with jOOQ"
+    name: "Demo APP with jooq"
   datasource:
-    url: jdbc:postgresql://localhost:5432/jooq-demo
+    url: ${POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
   data:
     redis:
       repositories:
         enabled: false
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
       username: redis
       password: redis
@@ -24,5 +24,4 @@ app:
     public-key: ${PUBLIC_KEY}
     private-key: ${PRIVATE_KEY}
 domain:
-  url: "http://localhost:8080/"
-  root: "http://localhost:8080"
+  root: http://localhost:8080

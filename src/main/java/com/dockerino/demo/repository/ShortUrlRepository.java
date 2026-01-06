@@ -43,13 +43,13 @@ public class ShortUrlRepository {
                 .map(this::mapRecordToShortUrl);
     }
 
-    public ShortUrl save(String originalUrl, UUID userId) {
+    public Long save(String originalUrl, UUID userId) {
         return dsl.insertInto(LINKS)
                 .set(LINKS.ORIGINAL_URL, originalUrl)
                 .set(LINKS.USER_ID, userId)
                 .set(LINKS.CREATED_AT, OffsetDateTime.now())
-                .returning()
-                .fetchOne(this::mapRecordToShortUrl);
+                .returningResult(LINKS.ID)
+                .fetchOne(LINKS.ID);
     }
 
     private ShortUrl mapRecordToShortUrl(LinksRecord r) {

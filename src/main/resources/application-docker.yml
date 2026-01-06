@@ -8,14 +8,14 @@ spring:
   application:
     name: "Demo APP with jOOQ"
   datasource:
-    url: jdbc:postgresql://postgres:5432/jooq-demo
+    url: ${POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
   data:
     redis:
       repositories:
         enabled: false
-      host: redis
+      host: ${REDIS_HOST}
       port: 6379
       username: redis
       password: redis
@@ -24,4 +24,4 @@ app:
     public-key: ${PUBLIC_KEY}
     private-key: ${PRIVATE_KEY}
 domain:
-  url: "http://localhost:8080/"
+  root: http://localhost:8080
