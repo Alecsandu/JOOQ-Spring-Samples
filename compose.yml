@@ -82,6 +82,25 @@ services:
     networks:
       - demo-net
 
+  prometheus:
+    image: prom/prometheus:v3.9.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./config/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - demo-net
+
+  zipkin:
+    image: openzipkin/zipkin:3-amd64
+    ports:
+      - "9411:9411"
+    environment:
+      - STORAGE_TYPE=mem
+    networks:
+      - demo-net
+
 networks:
   demo-net:
     driver: bridge
@@ -91,4 +110,4 @@ volumes:
   pgadmin_data: {}
   redis_data: {}
   redis_insights_data: {}
-
+  prometheus_data: {}

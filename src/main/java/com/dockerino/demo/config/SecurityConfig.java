@@ -45,7 +45,12 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**", "/api/well-known/**")
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/well-known/**",
+                                "/actuator/prometheus",
+                                "/actuator/health",
+                                "/actuator/info")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

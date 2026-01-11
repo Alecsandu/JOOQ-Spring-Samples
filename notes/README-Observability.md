@@ -73,3 +73,14 @@ Particularly the components which refer to observability tell the following:
 - metrics tell when something is happening (we can automate these and raise alerts or take other proactive actions)
 - traces show where something happened
 - logs explain why something happened
+
+## Prometheus
+
+Metrics aggregator.
+Use `curl http://localhost:8080/actuator/prometheus` to get manually metrics from the app.
+Go to `http://localhost:9090/query` to use prometheus ui to view metrics.
+
+## Zipkin
+
+Traces and spans ui.
+Go to `http://localhost:9411/zipkin/` to view traces and spans.

@@ -28,13 +28,25 @@ val jooqVersion = "3.19.29"
 val javaBase32Version = "1.0.0"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
+
+    /**
+     * Observability stack
+     * 1. Metrics & tracing endpoints - actuator
+     * 2. Metrics registry with prometheus
+     * 3. Tracing registry with zipkin
+     */
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("org.springframework.boot:spring-boot-starter-zipkin")
+
     implementation("in.co.tasky:java-base32:$javaBase32Version")
 
     implementation("com.nimbusds:nimbus-jose-jwt")

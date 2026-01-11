@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: "Demo APP with jooq"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets:
+          - "jooq-service:8080"
