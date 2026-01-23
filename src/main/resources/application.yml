@@ -12,6 +12,16 @@ spring:
     url: ${POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000 # 5 min
+      max-lifetime: 1200000 # 20 min
+      keepalive-time: 300000 # 5 min
+      connection-timeout: 20000 # 20 sec
+      validation-timeout: 5000 # 5 sec
+      leak-detection-threshold: 0 # for prod 20000 # 20 sec for debugging
+      register-mbeans: true
   data:
     redis:
       repositories:
@@ -39,6 +49,7 @@ management:
 logging:
   level:
     root: INFO
+    org.jooq.tools.LoggerListener: DEBUG
 
 app:
   jwt:
