@@ -23,7 +23,6 @@ public class AccountsApi {
 
     @GetMapping(
             value = "/userinfo",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<@NonNull UserInfo> getUserInfo(@RequestParam @Email String email) {
