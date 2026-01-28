@@ -72,6 +72,20 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
+        configuration.setMaxAge(3600L);
+
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "X-Requested-With"
+        ));
+
+        configuration.setExposedHeaders(List.of(
+                "Authorization",
+                "Content-Type"
+        ));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
