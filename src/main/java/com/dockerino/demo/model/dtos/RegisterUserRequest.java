@@ -1,20 +1,22 @@
 package com.dockerino.demo.model.dtos;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
 import org.jspecify.annotations.NonNull;
 
 public record RegisterUserRequest(
-        @NotBlank
+        @NotNull
         @Email
+        @Size(min = 10, max = 50)
         String email,
 
-        @NotBlank
+        @NotNull
         @Length(min = 14, max = 128)
         String password,
 
-        @NotBlank
+        @NotNull
         @Length(min = 5, max = 255)
         String username
 ) {
