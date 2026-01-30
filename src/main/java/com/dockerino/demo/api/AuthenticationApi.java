@@ -1,5 +1,6 @@
 package com.dockerino.demo.api;
 
+import com.dockerino.demo.config.util.IsUser;
 import com.dockerino.demo.model.dtos.BasicLoginRequest;
 import com.dockerino.demo.model.dtos.BasicLoginResponse;
 import com.dockerino.demo.model.dtos.RegisterUserRequest;
@@ -32,6 +33,7 @@ public class AuthenticationApi {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @IsUser
     public ResponseEntity<@NonNull BasicLoginResponse> login(
             @Valid @RequestBody BasicLoginRequest request
     ) {
@@ -47,6 +49,7 @@ public class AuthenticationApi {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @IsUser
     public ResponseEntity<@NonNull RegisterUserResponse> register(
             @Valid @RequestBody RegisterUserRequest request
     ) {

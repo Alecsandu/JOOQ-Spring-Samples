@@ -1,5 +1,6 @@
 package com.dockerino.demo.api;
 
+import com.dockerino.demo.config.util.IsUser;
 import com.dockerino.demo.model.dtos.UserInfo;
 import com.dockerino.demo.service.AccountsService;
 import jakarta.validation.constraints.Email;
@@ -25,6 +26,7 @@ public class AccountsApi {
             value = "/userinfo",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @IsUser
     public ResponseEntity<@NonNull UserInfo> getUserInfo(@RequestParam @Email String email) {
         UserInfo userInfo = accountsService.getUserInfo(email);
         return ResponseEntity.ok(userInfo);

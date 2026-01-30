@@ -1,5 +1,6 @@
 package com.dockerino.demo.api;
 
+import com.dockerino.demo.config.util.IsUser;
 import com.dockerino.demo.model.dtos.ShortUrlRequest;
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.service.ShortUrlService;
@@ -24,12 +25,14 @@ public class ShortUrlApi {
     }
 
     @PostMapping
+    @IsUser
     public ResponseEntity<@NonNull ShortUrlResponse> createShortUrl(@Valid @RequestBody ShortUrlRequest shortenRequest, HttpServletRequest request) {
         ShortUrlResponse response = shortUrlService.createShortUrl(shortenRequest.originalUrl(), request);
         return ResponseEntity.created(URI.create(response.shortcode())).body(response);
     }
 
     @GetMapping("/{shortCode}")
+    @IsUser
     public ResponseEntity<@NonNull Void> getUrlByShortCode(@PathVariable String shortCode) {
         String originalUrl = shortUrlService.getOriginalUrl(shortCode);
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
@@ -38,6 +41,7 @@ public class ShortUrlApi {
     }
 
     @GetMapping("/all")
+    @IsUser
     public ResponseEntity<@NonNull List<ShortUrlResponse>> getShortUrlsByUserId(HttpServletRequest request) {
         List<ShortUrlResponse> urlsByUserId = shortUrlService.getUserUrls(request);
         return ResponseEntity.ok(urlsByUserId);
