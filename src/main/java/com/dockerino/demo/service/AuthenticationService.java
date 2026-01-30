@@ -70,9 +70,38 @@ public class AuthenticationService {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(user.id().toString())
                 .issuedAt(now)
+                .claim(CustomClaims.ROLES.getValue(), CustomRoles.USER.getValue())
                 .expiresAt(now.plus(TOKEN_VALID_TIME, ChronoUnit.MINUTES))
                 .issuer(domainProperties.root())
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    private enum CustomClaims {
+        ROLES("roles");
+
+        private final String value;
+
+        CustomClaims(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    private enum CustomRoles {
+        USER("USER");
+
+        private final String value;
+
+        CustomRoles(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 }
