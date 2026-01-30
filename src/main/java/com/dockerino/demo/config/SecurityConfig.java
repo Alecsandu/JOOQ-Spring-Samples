@@ -69,7 +69,31 @@ public class SecurityConfig {
                 .build();
     }
 
-    CorsConfigurationSource corsConfigurationSource() {
+    @Bean
+    JwtDecoder jwtDecoder(RSAKey rsaKey) {
+        try {
+            return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder(RSAKey rsaKey) {
+        return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(rsaKey)));
+    }
+
+    @Bean
+    RSAKey rsaKey(JwtProperties jwtProperties) {
+        return new RSAKey
+                .Builder(jwtProperties.getPublicKey())
+                .privateKey(jwtProperties.getPrivateKey())
+                .keyUse(KeyUse.SIGNATURE)
+                .algorithm(JWSAlgorithm.RS256)
+                .build();
+    }
+
+    private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
@@ -96,29 +120,6 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    JwtDecoder jwtDecoder(RSAKey rsaKey) {
-        try {
-            return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Bean
-    JwtEncoder jwtEncoder(RSAKey rsaKey) {
-        return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(rsaKey)));
-    }
-
-    @Bean
-    RSAKey rsaKey(JwtProperties jwtProperties) {
-        return new RSAKey
-                .Builder(jwtProperties.getPublicKey())
-                .privateKey(jwtProperties.getPrivateKey())
-                .keyUse(KeyUse.SIGNATURE)
-                .algorithm(JWSAlgorithm.RS256)
-                .build();
-    }
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
         authoritiesConverter.setAuthoritiesClaimName("roles");
