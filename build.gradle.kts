@@ -1,8 +1,8 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.2"
+    id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.jooq.jooq-codegen-gradle") version "3.19.29"
+    id("org.jooq.jooq-codegen-gradle") version "3.19.30"
 }
 
 group = "com.dockerino"
@@ -24,7 +24,7 @@ repositories {
     mavenCentral()
 }
 
-val jooqVersion = "3.19.29"
+val jooqVersion = "3.19.30"
 val javaBase32Version = "1.0.0"
 
 dependencies {
