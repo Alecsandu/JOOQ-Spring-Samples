@@ -2,7 +2,7 @@ package com.dockerino.demo.repository;
 
 import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.exception.authentication.AuthenticationException;
-import com.dockerino.demo.exception.authentication.UserAlreadyExistsException;
+import com.dockerino.demo.exception.authentication.UserExistsException;
 import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.RegisterUserRequest;
 import com.dockerino.demo.model.dtos.RegisterUserResponse;
@@ -67,7 +67,7 @@ public class UserRepository {
             return new RegisterUserResponse(record.getId(), record.getEmail(), record.getUsername());
 
         } catch (DataIntegrityViolationException ex) {
-            throw new UserAlreadyExistsException("The email or username is already taken", ex);
+            throw new UserExistsException("The email or username is already taken", ex);
         }
     }
 
