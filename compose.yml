@@ -101,6 +101,47 @@ services:
     networks:
       - demo-net
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.2
+    depends_on:
+      - postgres-db
+    command:
+      - start
+    ports:
+      - "8081:8080"
+    environment:
+      # Admin bootstrap
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
+      # Database
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/jooq-demo
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: root
+      KC_DB_SCHEMA: keycloak
+      KC_DB_POOL_INITIAL_SIZE: 5
+      KC_DB_POOL_MIN_SIZE: 5
+      KC_DB_POOL_MAX_SIZE: 15
+      # Http
+      KC_HTTP_ENABLED: "true"
+      KC_HTTPS_ENABLED: "false"
+      # Proxy
+      KC_PROXY: none
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      # host
+      KC_HOSTNAME: localhost
+    volumes:
+      # Persist realm config, providers, themes, exports, etc
+      - keycloak_data:/opt/keycloak/data
+      - keycloak_themes:/opt/keycloak/themes
+      - keycloak_providers:/opt/keycloak/providers
+      # Optional realm import/export
+      # - ./config/docker/keycloak/realm-export.json:/opt/keycloak/data/import/realm.json
+    networks:
+      - demo-net
+
 networks:
   demo-net:
     driver: bridge
@@ -111,3 +152,6 @@ volumes:
   redis_data: {}
   redis_insights_data: {}
   prometheus_data: {}
+  keycloak_data: {}
+  keycloak_themes: {}
+  keycloak_providers: {}

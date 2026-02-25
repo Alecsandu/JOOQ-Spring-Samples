@@ -1,14 +1,10 @@
 package com.dockerino.demo.config;
 
-import com.dockerino.demo.config.properties.JwtProperties;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.KeyUse;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.dockerino.demo.config.security.UserSyncFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,24 +12,27 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @Configuration
 public class SecurityConfig {
+
+    private final UserSyncFilter userSyncFilter;
+
+    public SecurityConfig(@Lazy UserSyncFilter userSyncFilter) {
+        this.userSyncFilter = userSyncFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,43 +52,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/api/auth/**",
                                 "/api/well-known/**",
                                 "/actuator/prometheus",
                                 "/actuator/health",
-                                "/actuator/info")
+                                "/actuator/info"
+                        )
+                        .permitAll()
+                        .requestMatchers(RegexRequestMatcher.regexMatcher(Pattern.compile("^/api/url/[0-9A-HJKMNP-TV-Z]+$").toString()))
                         .permitAll()
                         .anyRequest()
                         .authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(
-                        jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                ))
-                .build();
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder(RSAKey rsaKey) {
-        try {
-            return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Bean
-    JwtEncoder jwtEncoder(RSAKey rsaKey) {
-        return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(rsaKey)));
-    }
-
-    @Bean
-    RSAKey rsaKey(JwtProperties jwtProperties) {
-        return new RSAKey
-                .Builder(jwtProperties.getPublicKey())
-                .privateKey(jwtProperties.getPrivateKey())
-                .keyUse(KeyUse.SIGNATURE)
-                .algorithm(JWSAlgorithm.RS256)
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .addFilterAfter(userSyncFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 
@@ -114,16 +89,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
-    }
-
-    private JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthoritiesClaimName("roles");
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
-
-        return jwtAuthenticationConverter;
     }
 }

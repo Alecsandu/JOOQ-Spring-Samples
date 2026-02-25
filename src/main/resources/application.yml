@@ -30,6 +30,13 @@ spring:
       port: 6379
       username: redis
       password: redis
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-xl6wtv65m32dksb1.eu.auth0.com/
+          jws-algorithms: RS256
+          audiences: https://my-api.example.com
 
 management:
   endpoints:
@@ -50,11 +57,6 @@ logging:
   level:
     root: INFO
     org.jooq.tools.LoggerListener: DEBUG
-
-app:
-  jwt:
-    public-key: ${PUBLIC_KEY}
-    private-key: ${PRIVATE_KEY}
 
 domain:
   root: http://localhost:8080

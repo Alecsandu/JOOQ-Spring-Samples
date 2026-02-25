@@ -32,7 +32,6 @@ public class ShortUrlApi {
     }
 
     @GetMapping("/{shortCode}")
-    @IsUser
     public ResponseEntity<@NonNull Void> getUrlByShortCode(@PathVariable String shortCode) {
         String originalUrl = shortUrlService.getOriginalUrl(shortCode);
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
