@@ -2,6 +2,7 @@ package com.dockerino.demo.service;
 
 import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.exception.authentication.InvalidTokenException;
+import com.dockerino.demo.model.User;
 import com.dockerino.demo.model.dtos.ShortUrlResponse;
 import com.dockerino.demo.repository.ShortUrlRepository;
 import com.dockerino.demo.repository.UserRepository;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,13 +37,12 @@ public class ShortUrlService {
 
     @Transactional
     public ShortUrlResponse createShortUrl(String originalUrl, HttpServletRequest request) {
-        UUID userId = getUserIdFromToken(request);
+        String auth0Sub = getUserSubFromToken(request);
 
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException();
-        }
+        User user = userRepository.findUserBySub(auth0Sub)
+                .orElseThrow(UserNotFoundException::new);
 
-        Long shortUrlId = shortUrlRepository.save(originalUrl, userId);
+        Long shortUrlId = shortUrlRepository.save(originalUrl, user.id());
 
         String shortcode = Base32.encode(shortUrlId.toString(), false);
 
@@ -60,13 +59,15 @@ public class ShortUrlService {
     }
 
     public List<ShortUrlResponse> getUserUrls(HttpServletRequest request) {
-        UUID userId = getUserIdFromToken(request);
+        String auth0Sub = getUserSubFromToken(request);
 
-        if (!userRepository.existsById(userId)) {
+        if (!userRepository.existsByAuth0Sub(auth0Sub)) {
             throw new UserNotFoundException();
         }
 
-        return shortUrlRepository.findAllByUserId(userId)
+        User user = userRepository.findUserBySub(auth0Sub).orElseThrow(UserNotFoundException::new);
+
+        return shortUrlRepository.findAllByUserId(user.id())
                 .map(su -> {
                     String shortcode = Base32.encode(su.id().toString(), false);
                     return new ShortUrlResponse(su.originalUrl(), shortcode);
@@ -74,12 +75,12 @@ public class ShortUrlService {
                 .collect(Collectors.toList());
     }
 
-    private UUID getUserIdFromToken(HttpServletRequest request) {
+    private String getUserSubFromToken(HttpServletRequest request) {
         String token = extractTokenFromHeader(request);
 
         Jwt jwt = jwtDecoder.decode(token);
 
-        return UUID.fromString(jwt.getClaim("sub"));
+        return jwt.getClaim("sub");
     }
 
     private String extractTokenFromHeader(HttpServletRequest request) {
