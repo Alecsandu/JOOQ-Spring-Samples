@@ -44,14 +44,14 @@ public class ShortUrlService {
 
         Long shortUrlId = shortUrlRepository.save(originalUrl, user.id());
 
-        String shortcode = Base32.encode(shortUrlId.toString(), false);
+        String shortcode = Base32.getEnDer(Base32.Encoding.CROCKFORD).encode(shortUrlId.toString(), false);
 
         return new ShortUrlResponse(originalUrl, shortcode);
     }
 
     public String getOriginalUrl(String shortCode) {
         try {
-            Long code = Long.valueOf(Base32.decode(shortCode, false));
+            Long code = Long.valueOf(Base32.getEnDer(Base32.Encoding.CROCKFORD).decode(shortCode, false));
             return shortUrlRepository.findByShortCode(code).originalUrl();
         } catch (NumberFormatException e) {
             throw new IllegalStateException("Invalid url");
@@ -69,7 +69,7 @@ public class ShortUrlService {
 
         return shortUrlRepository.findAllByUserId(user.id())
                 .map(su -> {
-                    String shortcode = Base32.encode(su.id().toString(), false);
+                    String shortcode = Base32.getEnDer(Base32.Encoding.CROCKFORD).encode(su.id().toString(), false);
                     return new ShortUrlResponse(su.originalUrl(), shortcode);
                 })
                 .collect(Collectors.toList());
