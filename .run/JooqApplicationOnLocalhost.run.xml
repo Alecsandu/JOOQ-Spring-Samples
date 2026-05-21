@@ -8,7 +8,7 @@
       <env name="PUBLIC_KEY" value="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAubsJjM65QMcnC2Glkk/IeoGtPn13ZJXlP3o5QodMy8yv9biqWvHgoojS79laJxXLbgJ792fYQ0rOsrrMBkVOQLy6RngTZxZCk8E+eD+Il3X+wNWqBMnkGnfgfSut7onL5HCKzzpv9OsVHymZ+/LPRXDIwiQVwKHKKxY5Y1fouj++JhC7gs335iLUdYnS1//p5R+3XMk+FI066qmkSNR6WGqeTSP1lrKl6fmLqZUPwkgjhrMwArnwlq2zszT7SGd5LaAb8uoXE4eLJUIpYrUy3pH68jjuwfSUrxwb89CaziSJ4Fjjvx91PQ7I2c89RNmcbJHauAO88SjN0d6C1ND+jwIDAQAB" />
       <env name="REDIS_HOST" value="localhost" />
     </envs>
-    <module name="jooq-spring-samples.main" />
+    <module name="com.dockerino.jooq-spring-samples.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.dockerino.demo.DemoApplication" />
     <extension name="coverage">
       <pattern>
