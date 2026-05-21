@@ -4,67 +4,62 @@ import com.dockerino.demo.exception.UserNotFoundException;
 import com.dockerino.demo.exception.authentication.AuthenticationException;
 import com.dockerino.demo.exception.authentication.UserExistsException;
 import com.dockerino.demo.model.User;
-import com.dockerino.demo.model.dtos.RegisterUserRequest;
-import com.dockerino.demo.model.dtos.RegisterUserResponse;
+import com.dockerino.jooq.generated.Tables;
 import com.dockerino.jooq.generated.tables.records.UsersRecord;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.jooq.TableField;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import static com.dockerino.jooq.generated.tables.UserRoles.USER_ROLES;
 import static com.dockerino.jooq.generated.tables.Users.USERS;
 
 @Repository
 public class UserRepository {
 
     private final DSLContext dsl;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserRepository(DSLContext dsl, PasswordEncoder passwordEncoder) {
+    public UserRepository(DSLContext dsl) {
         this.dsl = dsl;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    public User findByEmail(String email) {
-        UsersRecord record = dsl.selectFrom(USERS)
-                .where(USERS.EMAIL.eq(email))
-                .fetchOne();
-
-        return mapRecordToUser(record);
+    public Optional<User> findUserBySub(String sub) {
+        return dsl.selectFrom(Tables.USERS)
+                .where(USERS.AUTH0_SUB.eq(sub))
+                .fetchOptional()
+                .map(user -> new User(user.getId(), user.getAuth0Sub(), user.getCreatedAt(), user.getUpdatedAt(), user.getIsActive()));
     }
 
-    public Boolean existsById(UUID id) {
-        return existsByGivenField(USERS.ID, id);
+    public Boolean existsByAuth0Sub(String id) {
+        return existsByGivenField(USERS.AUTH0_SUB, id);
     }
 
-    public Boolean existsByEmail(String email) {
-        return existsByGivenField(USERS.EMAIL, email);
-    }
-
-    public Boolean existsByUsername(String username) {
-        return existsByGivenField(USERS.USERNAME, username);
-    }
-
-    public RegisterUserResponse save(RegisterUserRequest registerUserRequest) {
+    public User save(String sub, UUID roleId) {
         try {
-            UsersRecord record = dsl.insertInto(USERS, USERS.EMAIL, USERS.USERNAME, USERS.PASSWORD)
-                    .values(
-                            registerUserRequest.email(),
-                            registerUserRequest.username(),
-                            passwordEncoder.encode(registerUserRequest.password())
-                    )
-                    .returning(USERS.ID, USERS.EMAIL, USERS.USERNAME)
+            UsersRecord record = dsl.insertInto(USERS, USERS.AUTH0_SUB, USERS.IS_ACTIVE)
+                    .values(sub, true)
+                    .returning(USERS.ID, USERS.AUTH0_SUB)
                     .fetchOne();
 
             if (record == null) {
                 throw new AuthenticationException("Failed to create account");
             }
 
-            return new RegisterUserResponse(record.getId(), record.getEmail(), record.getUsername());
+            User user = mapRecordToUser(record);
+
+            int inserted = dsl.insertInto(USER_ROLES, USER_ROLES.USER_ID, USER_ROLES.ROLE_ID)
+                    .values(user.id(), roleId)
+                    .execute();
+
+            if (inserted != 1) {
+                throw new AuthenticationException("Failed to create account");
+            }
+
+            return user;
 
         } catch (DataIntegrityViolationException ex) {
             throw new UserExistsException("The email or username is already taken", ex);
@@ -84,10 +79,9 @@ public class UserRepository {
         }
 
         return new User(r.getId(),
-                r.getEmail(),
-                r.getPassword(),
-                r.getUsername(),
+                r.getAuth0Sub(),
                 r.getCreatedAt(),
-                r.getUpdatedAt());
+                r.getUpdatedAt(),
+                r.getIsActive());
     }
 }
